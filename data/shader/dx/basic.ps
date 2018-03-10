@@ -1,0 +1,30 @@
+Texture2D tex;
+SamplerState sampleState;
+
+struct PixelInput
+{
+    float4 pos : SV_POSITION;
+    float3 normal : NORMAL;
+    float st : ST;
+};
+
+//main entry
+float4 PS(PixelInput input) : SV_TARGET
+{
+    //ligth
+    float3 lightPos = float3(10,10,-10);
+    float3 lightDir = normalize(lightPos);
+
+    float NdotL = dot(input.normal, lightDir);
+
+    float3 diffuse = float3(0.7,0.7,0.7);
+
+    //test texture
+
+    float st = input.st;
+    st.x = 1 - st.x;
+
+    float4 texColor = tex.Sample(sampleState, st);
+
+    return  float4(diffuse * NdotL,1);
+}
