@@ -35,7 +35,8 @@ public:
 	virtual void Init(BufferCreateInfo& info) = 0;
 };
 
-struct InputLayout
+struct VertexInstancingBuffer : public Buffer
 {
-
+public:
+	virtual void Init(BufferCreateInfo& info) = 0;
 };

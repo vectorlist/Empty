@@ -2,7 +2,6 @@
 
 #include <graphics/texture.h>
 
-class ID3D11ShaderResourceView;
 class ID3D11SamplerState;
 class DXTexture : public Texture
 {

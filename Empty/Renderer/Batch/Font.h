@@ -19,3 +19,21 @@ struct FontGlyph
 
 	float offsety;
 };
+
+class Font final
+{
+public:
+	Font();
+	void Init(const char* filename, int size);
+	uint width;
+	uint height;
+	FontGlyph caractor[FONT_MAX_CHAR];
+	Texture* texture;
+	//ref charactor indirect by index
+	FontGlyph& operator[](uint index);
+};
+
+inline FontGlyph& Font::operator[](uint index) 
+{
+	return this->caractor[index];
+}

@@ -20,7 +20,7 @@ public:
 
 	void SetBrush(Brush& brush) { this->brush = brush; } //ptr dosent count
 	void SetPen(Pen& pen);
-	void SetFont(Font& font);
+	void SetFont(HFont& font);
 
 	void DrawLine(const Point& a, const Point& b);
 	void DrawString(const std::string& code, RECT& rect, UINT flag);

@@ -60,4 +60,8 @@ typedef unsigned char	uint8;
 #include <core/type.h>
 #include <core/log.h>
 
-
+//Defines
+//=================== FONT =======================
+#define FONT_MAX_BATCH						65536
+#define FONT_MAX_CHAR						128
+#define FONT_MIN_CHAR						32

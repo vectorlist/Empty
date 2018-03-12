@@ -128,6 +128,7 @@
     <ClCompile Include="Cache\SceneCache.cpp" />
     <ClCompile Include="Cache\ShaderCache.cpp" />
     <ClCompile Include="Cache\TextureCache.cpp" />
+    <ClCompile Include="Common\Terrain.cpp" />
     <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="core\FileSystem.cpp" />
     <ClCompile Include="Core\Input.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="Graphics\ContextDeform.cpp" />
     <ClCompile Include="Graphics\DX11\DXConstantBuffer.cpp" />
     <ClCompile Include="Graphics\DX11\DXContext.cpp" />
+    <ClCompile Include="Graphics\DX11\DXExtension\DDSTextureLoader.cpp" />
     <ClCompile Include="Graphics\DX11\DXModel.cpp" />
     <ClCompile Include="Graphics\DX11\DXShader.cpp" />
     <ClCompile Include="Graphics\DX11\DXTexture.cpp" />
@@ -150,7 +152,9 @@
     <ClCompile Include="Graphics\GL4\GLTexture.cpp" />
     <ClCompile Include="Graphics\GL4\GLUniformBuffer.cpp" />
     <ClCompile Include="Graphics\Model.cpp" />
-    <ClCompile Include="image\Image.cpp" />
+    <ClCompile Include="Image\Image.cpp" />
+    <ClCompile Include="image\ImageTool.cpp" />
+    <ClCompile Include="Image\Mipmap.cpp" />
     <ClCompile Include="math\aabb.cpp" />
     <ClCompile Include="math\frustum.cpp" />
     <ClCompile Include="math\transform.cpp" />
@@ -162,6 +166,7 @@
     <ClCompile Include="renderer\batch\DebugBatch.cpp" />
     <ClCompile Include="Renderer\batch\DX11\DXDebugBatch.cpp" />
     <ClCompile Include="renderer\batch\DX11\DXFontBatch.cpp" />
+    <ClCompile Include="Renderer\Batch\Font.cpp" />
     <ClCompile Include="renderer\batch\FontBatch.cpp" />
     <ClCompile Include="Renderer\batch\GL4\GLDebugBatch.cpp" />
     <ClCompile Include="renderer\batch\GL4\GLFontBatch.cpp" />
@@ -179,6 +184,7 @@
     <ClInclude Include="Cache\SceneCache.h" />
     <ClInclude Include="Cache\ShaderCache.h" />
     <ClInclude Include="Cache\TextureCache.h" />
+    <ClInclude Include="Common\Terrain.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="core\FileSystem.h" />
     <ClInclude Include="core\ForwardDecl.h" />
@@ -196,11 +202,12 @@
     <ClInclude Include="Graphics\DX11\DXConfig.h" />
     <ClInclude Include="Graphics\DX11\DXConstantBuffer.h" />
     <ClInclude Include="Graphics\DX11\DXContext.h" />
+    <ClInclude Include="Graphics\DX11\DXExtension\DDSTextureLoader.h" />
     <ClInclude Include="Graphics\DX11\DXModel.h" />
     <ClInclude Include="Graphics\DX11\DXShader.h" />
     <ClInclude Include="Graphics\DX11\DXTexture.h" />
-    <ClInclude Include="graphics\gl45\GLConfig.h" />
     <ClInclude Include="graphics\gl45\glextension\GLExtension.h" />
+    <ClInclude Include="Graphics\GL4\GLConfig.h" />
     <ClInclude Include="Graphics\GL4\GLContext.h" />
     <ClInclude Include="Graphics\GL4\GLModel.h" />
     <ClInclude Include="Graphics\GL4\GLShader.h" />
@@ -210,7 +217,9 @@
     <ClInclude Include="Graphics\Shader.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\UniformBuffer.h" />
-    <ClInclude Include="image\Image.h" />
+    <ClInclude Include="Image\Image.h" />
+    <ClInclude Include="image\ImageTool.h" />
+    <ClInclude Include="Image\Mipmap.h" />
     <ClInclude Include="math\aabb.h" />
     <ClInclude Include="math\frustum.h" />
     <ClInclude Include="math\math.h" />

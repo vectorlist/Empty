@@ -62,6 +62,35 @@ namespace math
 		return logf(x) * INV_LOG2NAT2;
 	}
 
+	inline bool IsPowOf2(unsigned int x)
+	{
+		return (x & (x - 1)) == 0;
+	}
+
+	//https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
+	inline unsigned int RoundUpPow2(unsigned int x)
+	{
+		//must be type out out bound
+		assert(sizeof(unsigned int) <= 4);			//for platform
+		--x;
+		x |= x >> 1;
+		x |= x >> 2;
+		x |= x >> 4;
+		x |= x >> 8;
+		x |= x >> 16;
+		++x;
+		return x;
+	}
+
+	inline int FloorInt(float f)
+	{
+		return (int)floor(f);
+	}
+
+	inline int ClampInt(int v, const int minimum, int maximim)
+	{
+		return (v > maximim ? maximim : v < minimum ? minimum : v);
+	}
 }
 
 //if (isMip)
@@ -73,3 +102,13 @@ namespace math
 //}
 //
 //return 1;
+
+//unsigned int v; // compute the next highest power of 2 of 32-bit v
+//
+//v--;
+//v |= v >> 1;
+//v |= v >> 2;
+//v |= v >> 4;
+//v |= v >> 8;
+//v |= v >> 16;
+//v++;

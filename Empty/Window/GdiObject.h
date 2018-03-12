@@ -94,16 +94,16 @@ private:
 #define FONT_SEGOEUI_FAMILY		"Segoe UI"
 #define FONT_CONSOLAS_FAMILY	"Consolas"
 
-class Font
+class HFont
 {
 public:
-	Font()
+	HFont()
 	{
 		mFont = std::make_shared<GDIObj>();
 		mFont->mData = CreateFontA(FONT_DEFAULT_SIZE, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, FONT_SEGOEUI_FAMILY);
 	}
-	Font(LPCSTR family, int size = 20)
+	HFont(LPCSTR family, int size = 20)
 	{
 		mFont = std::make_shared<GDIObj>();
 		mFont->mData = CreateFontA(size, 0, 0, 0, 0, 0, 0,

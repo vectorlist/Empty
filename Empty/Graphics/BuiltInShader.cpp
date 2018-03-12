@@ -526,22 +526,50 @@ cbuffer matrice : register(b1)				//index 0 avoid main matrices
 
 struct VS_In
 {
-	float4 pos : POSITION;
-	float4 uv : UV;
-	float4 color : TEXCOORD;
+	float4 bpos : POSITION;
+	float4 buv : TEXCOORD;
+	float4 color : COLOR;
 };
 
 struct PS_In
 {
 	float4 pos : SV_POSITION;
+	float2 st : TEXCOORD;
+	float4 color : COLOR;
 };	
 
-PS_In VS(VS_In vs)
+PS_In VS(VS_In vs, uint id : SV_VertexID)
 {
+	//Relative GLSL Instancing
 	PS_In ps;
-	vs.pos.w =1;
-	ps.pos = float4(1,1,1,1);
+	
+	float4 pos = vs.bpos;
+	float4 uv = vs.buv;
+	
+	const float3 vtx[6]= {
+	{pos.x        , pos.y		 , 0},		// 0 index
+	{pos.x + pos.z, pos.y        , 0},		// 1 index
+	{pos.x        , pos.y + pos.w, 0},		// 2 index
+	{pos.x        , pos.y + pos.w, 0},		// 2 index
+	{pos.x + pos.z, pos.y        , 0},		// 1 index
+	{pos.x + pos.z, pos.y + pos.w, 0}		// 3 index
+	};
 
+	const float2 st[6] = {
+	{uv.x, uv.y},
+	{uv.z, uv.y},
+	{uv.x, uv.w},
+	{uv.x, uv.w},
+	{uv.z, uv.y},
+	{uv.z, uv.w}
+	};
+
+	float3 currentVtx = vtx[id];
+	float2 currentST = st[id];
+
+	ps.pos = mul(float4(currentVtx,1), screen);
+	ps.st = currentST;
+	ps.color = vs.color;
 	return ps;
 };
 
@@ -551,11 +579,19 @@ const char* instanceFontFS = R"(
 struct PS_In
 {
 	float4 pos : SV_POSITION;
+	float2 st : TEXCOORD;
+	float4 color : COLOR;
 };
+
+Texture2D tex0;
+SamplerState samplerState;
 
 float4 PS(PS_In ps) : SV_TARGET
 {
-	return float4(1,1,1,1);
+	float4 color = ps.color;
+	float4 texColor = tex0.Sample(samplerState, ps.st);
+	color.a = texColor.r;
+	return color;
 };
 
 )";
@@ -566,8 +602,8 @@ void DXInternalFontShader::CreateInputLayout(ID3DBlob* vBlob)
 {
 	std::vector<D3D11_INPUT_ELEMENT_DESC> inputs = {
 		{ "POSITION",0,DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_INSTANCE_DATA,1 },
-		{ "UV",0,DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA,1 },
-		{ "TEXCOORD",0,DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA,1 }
+		{ "TEXCOORD",0,DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA,1 },
+		{ "COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA,1 }
 	};
 
 	G_DXDevice->CreateInputLayout(

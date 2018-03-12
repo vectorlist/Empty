@@ -1,25 +1,50 @@
 #pragma once
 
-#include <core/type.h>
+#include <Image/Mipmap.h>
 
-#define FOURCC_DXT1  0x31545844 //(MAKEFOURCC('D','X','T','1'))
-#define FOURCC_DXT3  0x33545844 //(MAKEFOURCC('D','X','T','3'))
-#define FOURCC_DXT5  0x35545844 //(MAKEFOURCC('D','X','T','5'))
+enum class PixelFormat
+{
+	R8 = 0,
+	R16,
+	RG8,
+	RGB8,
+	RGB16,
+	RGBA8,
+	RGBA16,
+	UNKNOWN
+};
+
+#define IMAGE_REQ_R					1U
+#define IMAGE_REQ_RB				2U
+#define IMAGE_REQ_RGB				3U
+#define IMAGE_REQ_RGBA				4U
 
 class Image
 {
 public:
-	static void LoadDDSFromFileToGL(const std::string& filename, GLTexture* texture);
-};
+	Image();
+	~Image(){}
 
+	void LoadFromFile(const char* filename, uint requestBytePerPixel = IMAGE_REQ_RGBA);
 
-struct GLDDS
-{
-	uint height;
-	uint width;
-	uint linearSize;
-	uint mipmapNum;
-	uint format;								//FourCC type
-	unsigned char* buffer;						//must be free
-	uint bufferSize;
+	bool		IsPow2() const;
+	PixelFormat GetFormat() const;
+	uint		GetBytePerPixel() const;
+	uint		GetWidth() const;
+	uint		GetHeight() const;
+	std::string	GetFormatStr(PixelFormat format);
+	uint8*		GetData();
+	bool		CreateMipmaps(Mipmap* mipmap);
+private:
+	//OpenGL , DirectX auto gen mipmap
+	uint GetGraphicsMipmapPossibilityCount(uint width, uint height);
+	//Force to Gen Mipmap menually by Pixels (with power of 2)
+	uint GetPxielsMipmapPossibilityCount(uint width, uint height);
+	//std::unique_ptr<RGBA8[]> mPixels;
+	std::unique_ptr<uint8[]> mPixels;
+
+	PixelFormat mFormat;
+	uint mBytePerPixel;
+	uint mWidth;
+	uint mHeight;
 };

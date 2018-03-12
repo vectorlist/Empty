@@ -7,7 +7,11 @@
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
+#include <Graphics/Context.h>
+#include <Graphics/DX11/DXContext.h>
+
 DXFontBatch::DXFontBatch()
+	: mIsBegin(false), mCurrentVtxIndexed(0), mCurrentVtxPtr(nullptr)
 {
 }
 
@@ -36,18 +40,77 @@ void DXFontBatch::Init(const char* filename, int size)
 
 	CreateFontAndTexture(filename, size);
 	CreateBuffers();
+
+	mVertices = std::unique_ptr<FontInstanceVertex[]>(new FontInstanceVertex[FONT_MAX_BATCH]);
 }
 
 void DXFontBatch::BeginBatch()
 {
+	mIsBegin = true;
+	mCurrentVtxIndexed = 0;
+	//reset current pointer
+	mCurrentVtxPtr = mVertices.get();
 }
 
 void DXFontBatch::Render(int x, int y, const char * text, const vec4f & color)
 {
+	if (mIsBegin == false) return;
+	//Increate Current Vertice Index
+	const uint8* c;
+
+	for (c = (const uint8*)text; *c; ++c) 
+	{
+		//check out of bound
+		if (mCurrentVtxIndexed >= FONT_MAX_BATCH) break;
+		auto& font = fonts[*c];
+
+		float posx = x + font.bl;
+		float posy = (y - (font.h - font.bt)) + mHeight;
+
+		float w = (float)font.w;
+		float h = (float)font.h;
+
+		//Increase offset of sizeof(FontInstanceVertex)
+		*mCurrentVtxPtr++ = {
+			vec4f(posx, posy, w, h),
+			vec4f(font.uvx1, font.uvy1, font.uvx2, font.uvy2),
+			color};
+
+		mCurrentVtxIndexed++;
+		x += font.ax;
+	}
 }
 
 void DXFontBatch::EndBatch()
 {
+	if (mIsBegin == false) return;
+
+	//TODO : Update Buffer
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+	G_DXContext->Map(mVbo, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	memcpy(mapped.pData, mVertices.get(), sizeof(FontInstanceVertex) * mCurrentVtxIndexed);
+	G_DXContext->Unmap(mVbo, 0);
+
+	mShader->Bind();
+	mUbo->BindVS(1);
+
+
+	uint stride = sizeof(FontInstanceVertex);
+	uint offset = 0;
+
+	//TODO : this group to GContext for shared vertex buffer
+	G_DXContext->IASetVertexBuffers(0, 1, &mVbo, &stride, &offset);
+	
+	//Bind Texture and Sampler
+	G_DXContext->PSSetShaderResources(0, 1, &mTexture);
+	auto sampler = static_cast<DXContext*>(G_Context)->state.samplerWarpState;
+	G_DXContext->PSSetSamplers(0, 1, &sampler);
+
+	uint instancingNum = mCurrentVtxIndexed;
+	
+	G_Context->SetBlendState(true);
+	G_DXContext->DrawInstanced(6, instancingNum, 0, 0);
+	G_Context->SetBlendState(false);
 }
 
 void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
@@ -70,34 +133,43 @@ void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
 
 	FT_GlyphSlot glyph = face->glyph;
 
-	uint rowWidth = 0;
-	uint rowHeight = 0;
+	uint width = 0;
+	uint height = 0;
 
 	//calc total font width height
-	for (int c = 32; c < MAX_CHARACTOR; ++c)
+	for (int c = FONT_MIN_CHAR; c < FONT_MAX_CHAR; ++c)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			continue;
 		}
-		rowWidth += glyph->bitmap.width;
-		rowHeight = std::max(rowHeight, glyph->bitmap.rows);
+		width += glyph->bitmap.width;
+		height = std::max(height, glyph->bitmap.rows);
 	}
 
-	mWidth = rowWidth;
-	mHeight = rowHeight;
+	mWidth = width;
+	mHeight = height;
 
-	//TODO : DirectX Texture
-
+	//allocate buffer
+	uint8* buffer = new uint8[width * height];
+	
+	memset(buffer, (uint8)0, sizeof(uint8) * width * height);
+	memset(fonts, 0, sizeof(fonts));
 
 	int offsetx = 0;
 	int offsety = 0;
-
-	memset(fonts, 0, sizeof(fonts));
-
-	for (int c = 32; c < MAX_CHARACTOR; ++c)
+	for (int c = FONT_MIN_CHAR; c < FONT_MAX_CHAR; ++c)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			continue;
+		}
+
+		auto& bitmap = glyph->bitmap;
+		//Set Buffer
+		for (int y = 0; y < bitmap.rows; ++y) {
+			for (int x = 0; x < bitmap.width; ++x) {
+				buffer[(y * width) + (offsetx + x)] =
+					bitmap.buffer[y * bitmap.width + x];
+			}
 		}
 
 		fonts[c].ax = glyph->advance.x >> 6;
@@ -115,15 +187,55 @@ void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
 		fonts[c].uvy1 = (float)offsety / (float)mHeight;
 		fonts[c].uvy2 = (float)(offsety + glyph->bitmap.rows) / (float)mHeight;
 
-		rowHeight = std::max(rowHeight, glyph->bitmap.rows);
 		offsetx += glyph->bitmap.width;
 	}
 
-	//Release FT
+	D3D11_TEXTURE2D_DESC textureInfo{};
+	textureInfo.Width = width;
+	textureInfo.Height = height;
+	textureInfo.MipLevels = 1;
+	textureInfo.ArraySize = 1;
+	textureInfo.Format = DXGI_FORMAT_R8_UNORM;
+	textureInfo.SampleDesc.Count = 1;
+	textureInfo.SampleDesc.Quality = 0;
+	textureInfo.Usage = D3D11_USAGE_DEFAULT;
+	textureInfo.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	textureInfo.CPUAccessFlags = 0;
+	textureInfo.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA data;
+	data.pSysMem = buffer;
+	data.SysMemPitch = width;
+	data.SysMemSlicePitch = width * height;
+
+	ID3D11Texture2D* texture2D;
+
+	LOG_HR << G_DXDevice->CreateTexture2D(&textureInfo, &data, &texture2D);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvInfo{};
+
+	srvInfo.Format = textureInfo.Format;
+	srvInfo.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvInfo.Texture2D.MipLevels = 1;
+	srvInfo.Texture2D.MostDetailedMip = 0;
+
+	LOG_HR << G_DXDevice->CreateShaderResourceView(texture2D, &srvInfo, &mTexture);
+
+	//Release all
 	FT_Done_Face(face);
 	FT_Done_FreeType(lib);
+	delete[] buffer;
 }
 
 void DXFontBatch::CreateBuffers()
 {
+	D3D11_BUFFER_DESC vtxInfo{};
+	vtxInfo.Usage = D3D11_USAGE_DYNAMIC;
+	vtxInfo.ByteWidth = sizeof(FontInstanceVertex) * FONT_MAX_BATCH;
+	vtxInfo.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vtxInfo.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	vtxInfo.MiscFlags = 0;
+	vtxInfo.StructureByteStride = 0;
+
+	LOG_HR << G_DXDevice->CreateBuffer(&vtxInfo, nullptr, &mVbo);
 }

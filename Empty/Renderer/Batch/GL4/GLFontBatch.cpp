@@ -150,7 +150,7 @@ void GLFontBatch::CreateFontAndTexture(const char * filename, int size)
 	uint rowHeight = 0;
 
 	//calc total font width height
-	for (int c = 32; c < MAX_CHARACTOR; ++c)
+	for (int c = FONT_MIN_CHAR; c < FONT_MAX_CHAR; ++c)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			continue;
@@ -183,7 +183,7 @@ void GLFontBatch::CreateFontAndTexture(const char * filename, int size)
 
 	memset(fonts, 0, sizeof(fonts));
 
-	for (int c = 32; c < MAX_CHARACTOR; ++c)
+	for (int c = FONT_MIN_CHAR; c < FONT_MAX_CHAR; ++c)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
 			continue;

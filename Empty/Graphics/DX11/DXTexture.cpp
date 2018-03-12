@@ -5,7 +5,7 @@
 
 #include <graphics/contextdeform.h>
 
-//TODO make External static Sampler
+//TODO : Seperate Sampler and Texture
 ID3D11SamplerState* DXTexture::mSampler = nullptr;
 
 DXTexture::DXTexture()

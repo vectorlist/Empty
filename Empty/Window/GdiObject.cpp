@@ -16,7 +16,7 @@ void Painter::SetPen(Pen& pen)
 	::SelectObject(dc, pen);
 }
 
-void Painter::SetFont(Font& font)
+void Painter::SetFont(HFont& font)
 {
 	::SelectObject(dc, font);
 }

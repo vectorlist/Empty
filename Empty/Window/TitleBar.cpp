@@ -46,7 +46,7 @@ LRESULT TitleBar::LocalWndProc(UINT msg, WPARAM wp, LPARAM lp)
 	{
 		auto info = GetSubSystem<ApplicationInfo>();
 		Painter painter(mHandle);
-		static Font font(FONT_SEGOEUI_FAMILY, 20);
+		static HFont font(FONT_SEGOEUI_FAMILY, 20);
 		painter.SetFont(font);
 		RECT rect = GetRect();
 		rect.left += 12;

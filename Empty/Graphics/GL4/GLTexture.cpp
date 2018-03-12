@@ -1,7 +1,7 @@
 #include <PCH.h>
 #include <Graphics/GL4/GLTexture.h>
 #include <Graphics/GL4/GLConfig.h>
-#include <Image/Image.h>
+#include <Image/ImageTool.h>
 
 #include <Graphics/ContextDeform.h>
 
@@ -18,7 +18,7 @@ GLTexture::~GLTexture()
 
 void GLTexture::InitFromFile(const std::string& filename)
 {
-	Image::LoadDDSFromFileToGL(filename, this);
+	ImageTool::LoadDDSFromFileToGL(filename, this);
 }
 
 void GLTexture::Init(TextureCreateInfo& info)

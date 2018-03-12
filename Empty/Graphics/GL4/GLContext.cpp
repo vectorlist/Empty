@@ -157,6 +157,7 @@ void GLContext::Init()
 
 	glViewport(0, 0, (int)mWidth, (int)mHeight);
 	glClearColor(0, 0, 0, 1);
+	//GL_ARB_texture_non_power_of_two
 }
 
 

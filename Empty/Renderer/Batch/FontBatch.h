@@ -1,11 +1,5 @@
 #pragma once
 
-//#define FONT_MAX_BATCH						65536
-#define FONT_MAX_BATCH						2048
-
-#define MAX_CHARACTOR						128
-
-
 #include <renderer/batch/Font.h>
 
 struct FontInstanceVertex

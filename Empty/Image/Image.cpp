@@ -1,102 +1,143 @@
 #include <PCH.h>
 #include <Image/Image.h>
-#include <Graphics/GL4/GLTexture.h>
-#include <Graphics/GL4/GLConfig.h>
+#include <Math/math.h>
 
-void Image::LoadDDSFromFileToGL(const std::string& filename, GLTexture* texture)
+#define STB_IMAGE_IMPLEMENTATION
+#include <STB/stb_image.h>
+
+Image::Image()
+	: mFormat(PixelFormat::UNKNOWN), mWidth(0), mHeight(0), mBytePerPixel(3)
 {
-	//https://www.opengl.org/discussion_boards/archive/index.php/t-126118.html
+}
 
-	FILE* file;
+void Image::LoadFromFile(const char* filename, uint requestBytePerPixel)
+{
+	ASSERT_MSG(requestBytePerPixel < 5, "invalid byte per pixels");
+	int w, h, comp;
+	uint8* buffer = stbi_load(filename, &w, &h, &comp, requestBytePerPixel);
 
-	file = fopen(filename.c_str(), "rb");
+	mBytePerPixel = requestBytePerPixel;
 
-	if (!file) LOG_ERROR("failed to find file");
-
-	char fileCode[4];
-	fread(fileCode, 1, 4, file);
-
-	if (strncmp(fileCode, "DDS ", 4) != 0) LOG_ERROR("please dds file");
-
-	unsigned char proxy[124];
-	fread(&proxy, 124, 1, file);
+	if (!buffer){
+		ASSERT_MSG(0, "failed to load image");
+	}
 	
-	//-------------- read from headers from file ---------------
-	GLDDS dds;
-	dds.height = *(unsigned int*)&(proxy[8]);
-	dds.width = *(unsigned int*)&(proxy[12]);
-	dds.linearSize = *(unsigned int*)&(proxy[16]);
-	dds.mipmapNum = *(unsigned int*)&(proxy[24]);
-	uint selectType = *(unsigned int*)&(proxy[80]);
-
-	//-------------------- create buffer -----------------------
-	dds.bufferSize = (dds.mipmapNum > 1) ? dds.linearSize * 2 : dds.linearSize;
-	dds.buffer = (unsigned char*)malloc(dds.bufferSize * sizeof(unsigned char));
-	fread(dds.buffer, 1, dds.bufferSize, file);
-
-	//TODO : RGA is not support 
-	switch (selectType)
+	PixelFormat format;
+	switch (mBytePerPixel)
 	{
-	case FOURCC_DXT1:
-	{
-		dds.format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+	case 1:
+		format = PixelFormat::R8;
 		break;
-	}
-	case FOURCC_DXT3:
-	{
-		dds.format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+	case 2:
+		format = PixelFormat::RG8;
 		break;
-	}
-	case FOURCC_DXT5:
-	{
-		dds.format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+	case 3:
+		format = PixelFormat::RGB8;
 		break;
-	}
+	case 4:
+		format = PixelFormat::RGBA8;
+		break;
 	default:
-		dds.format = UINT_MAX;
-		assert(0 && "fatal : failed to find dds type");
+		format = PixelFormat::UNKNOWN;
 		break;
 	}
 
-	//create gl textures
-	glGenTextures(1, &texture->mTexture);
-	glBindTexture(GL_TEXTURE_2D, texture->mTexture);
+	LOG << "Image Format : " << GetFormatStr(format) << ENDN;
+	LOG << "Width : " << w << ENDN;
+	LOG << "Height : " << h << ENDN;
+	LOG << "Graphically Mipmap gen count : " << GetGraphicsMipmapPossibilityCount(w, h) << ENDN;
+	LOG << "Pixel Mipmap gen count : " << GetPxielsMipmapPossibilityCount(w, h) << ENDN;
+	
+	mFormat = format;
+	mWidth = w;
+	mHeight = h;
+	//mPixels = std::unique_ptr<uint8[]>(std::move(buffer));
+	mPixels = std::make_unique<uint8[]>(w * h * mBytePerPixel);	
+	memcpy(mPixels.get(), buffer, w * h * mBytePerPixel);
 
-	//using slice memory alignment
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	STBI_FREE(buffer);
+}
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+PixelFormat Image::GetFormat() const
+{
+	return mFormat;
+}
 
-	//find width memory slice block
-	uint blockSize = dds.format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT ? 8 : 16;
-	uint offset = 0;
+uint Image::GetBytePerPixel() const
+{
+	return mBytePerPixel;
+}
 
-	uint width = dds.width;
-	uint height = dds.height;
-	for (uint level = 0; level < dds.mipmapNum; ++level)
+uint Image::GetWidth() const
+{
+	return mWidth;
+}
+
+uint Image::GetHeight() const
+{
+	return mHeight;
+}
+
+uint8* Image::GetData()
+{
+	return mPixels.get();
+}
+
+uint Image::GetGraphicsMipmapPossibilityCount(uint width, uint height)
+{
+	uint  mipCount = 1;
+	while (width > 1 && height > 1)
 	{
-		uint size = ((width + 3) / 4) * ((height + 3) / 4) * blockSize;
-
-		//we dont allow to 0 x 0 texture
-		if (width == 0 && height == 0) continue;		//break when 0
-
-		auto currentBuffer = (unsigned char*)dds.buffer + offset;
-		glCompressedTexImage2DARB(GL_TEXTURE_2D,
-			level,
-			dds.format,
-			width, height, 0, size, currentBuffer);
-
-		offset += size;
-		width /= 2;
-		height /= 2;
+		width = std::max((uint)width / 2, 1U);
+		height = std::max((uint)height / 2, 1U);
+		++mipCount;
 	}
+	return mipCount;
+}
 
-	texture->width = dds.width;
-	texture->height = dds.height;
+uint Image::GetPxielsMipmapPossibilityCount(uint width, uint height)
+{
+	uint pow2W = width;
+	uint pow2H = height;
+	if (!math::IsPowOf2(width) || !math::IsPowOf2(height))
+	{
+		pow2W = math::RoundUpPow2(width);
+		pow2H = math::RoundUpPow2(height);
+	}
+	return GetGraphicsMipmapPossibilityCount(pow2W, pow2H);
+}
 
-	free(dds.buffer);
-	fclose(file);
+bool Image::IsPow2() const
+{
+	if (!math::IsPowOf2(mWidth) || !math::IsPowOf2(mHeight))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool Image::CreateMipmaps(Mipmap* mipmap)
+{
+	if (!mipmap->GenerateMipmap(this->GetData(), mWidth, mHeight, mBytePerPixel)) {
+		return false;
+	}
+	return true;
+}
+
+std::string Image::GetFormatStr(PixelFormat format)
+{
+	switch (format)
+	{
+	case PixelFormat::R8:
+		return "R8";
+	case PixelFormat::RG8:
+		return "RG8";
+		break;
+	case PixelFormat::RGB8:
+		return "RGB8";
+	case PixelFormat::RGBA8:
+		return "RG8A8";
+	default:
+		return "UNKNWON FORMAT";
+	}
 }
