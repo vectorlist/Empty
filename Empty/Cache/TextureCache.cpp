@@ -68,3 +68,31 @@ Texture* TextureCache::CreateTexture(TextureCreateInfo& info)
 	mInternalTexture.insert(std::make_pair(mInternalTextureCount, texture));
 	return static_cast<Texture*>(texture.get());
 }
+
+Texture* TextureCache::LoadTextureImage(const std::string& filename)
+{
+	auto found = mTextures.find(filename);
+	if (found != mTextures.end()) {
+		return found->second.get();
+	}
+
+	std::shared_ptr<Texture> texture = nullptr;
+
+	switch (G_Context->GetApiType())
+	{
+	case GraphicAPI::OPENGL45:
+		texture = std::make_shared<GLTexture>();
+		texture->InitFromImage(filename);
+		break;
+	case GraphicAPI::DIRECTX11:
+		texture = std::make_shared<DXTexture>();
+		texture->InitFromImage(filename);
+		break;
+	default:
+		break;
+	}
+
+	mTextures.insert(std::make_pair(filename, texture));
+
+	return texture.get();
+}

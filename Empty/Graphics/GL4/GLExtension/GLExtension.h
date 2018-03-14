@@ -24,12 +24,6 @@ typedef void GLvoid;
 #include <GL/GL.h>
 #include <assert.h>
 
-namespace WGL
-{
-	bool InitWGL();
-	bool InitGLEXT();
-}
-
 #define GL_DECL_PFN(type, func) \
 do{ \
 	func = reinterpret_cast<type>(wglGetProcAddress(#func));\
@@ -38,13 +32,17 @@ do{ \
 	}\
 }while(false)	// run once
 
-
-//====================== WGL ============================
+namespace WGL
+{
+bool InitWGL();
+bool InitGLEXT();
+}
+//====================== WGL =============================
 extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 
-//======================= GL EXT ======================== (Add Func what u want)
+//===================== GL EXT ===========================
 extern PFNGLGENBUFFERSPROC glGenBuffers;
 extern PFNGLBINDBUFFERPROC glBindBuffer;
 extern PFNGLBUFFERDATAPROC glBufferData;
@@ -82,13 +80,16 @@ extern PFNGLACTIVETEXTUREPROC			glActiveTexture;
 extern PFNGLCREATETEXTURESPROC			glCreateTextures;
 extern PFNGLTEXTUREPARAMETERIPROC		glTextureParameteri;
 extern PFNGLBINDTEXTUREUNITPROC			glBindTextureUnit;
+extern PFNGLGENERATEMIPMAPPROC			glGenerateMipmap;
 
 //=================== EXT ===============================
 extern PFNGLNAMEDBUFFERSUBDATAEXTPROC		glNamedBufferSubDataEXT;
 extern PFNGLBINDBUFFERBASEPROC				glBindBufferBase;
 extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2DARB;
+extern PFNGLBINDBUFFERRANGEPROC				glBindBufferRange;
 
 
 //================== GL 4.4 ==============================
 
 extern PFNGLCLIPCONTROLPROC				glClipControl;
+

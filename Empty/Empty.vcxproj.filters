@@ -52,14 +52,11 @@
     <Filter Include="Empty\Renderer\Batch\DX11">
       <UniqueIdentifier>{2ad6338c-90d4-43f4-90cc-17263cbba5ca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Empty\ECS">
-      <UniqueIdentifier>{dd0e9f4f-5f40-4461-a617-04502a5d7861}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Empty\Common">
-      <UniqueIdentifier>{29856f74-960f-4157-9071-d1ff62eed4e7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Empty\Graphics\DX11\DXExtension">
       <UniqueIdentifier>{ac25a482-c044-460a-999d-382e56a8406a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Empty\World">
+      <UniqueIdentifier>{51d31c3a-ffed-48ba-86e6-b788c66ef854}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -103,9 +100,6 @@
       <Filter>Empty\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Context.cpp">
-      <Filter>Empty\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ContextDeform.cpp">
       <Filter>Empty\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\GL4\GLShader.cpp">
@@ -168,9 +162,6 @@
     <ClCompile Include="Window\GdiObject.cpp">
       <Filter>Empty\Window</Filter>
     </ClCompile>
-    <ClCompile Include="ECS\SubSystem.cpp">
-      <Filter>Empty\ECS</Filter>
-    </ClCompile>
     <ClCompile Include="renderer\Renderer.cpp">
       <Filter>Empty\Renderer</Filter>
     </ClCompile>
@@ -185,9 +176,6 @@
     </ClCompile>
     <ClCompile Include="Graphics\GL4\GLContext.cpp">
       <Filter>Empty\Graphics\GL4</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\GL4\GLExtension\GLExtension.cpp">
-      <Filter>Empty\Graphics\GL4\GLExtension</Filter>
     </ClCompile>
     <ClCompile Include="Cache\ShaderCache.cpp">
       <Filter>Empty\ResourceCache</Filter>
@@ -204,9 +192,6 @@
     <ClCompile Include="Renderer\Batch\Font.cpp">
       <Filter>Empty\Renderer\Batch</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Terrain.cpp">
-      <Filter>Empty\Common</Filter>
-    </ClCompile>
     <ClCompile Include="image\ImageTool.cpp">
       <Filter>Empty\Image</Filter>
     </ClCompile>
@@ -218,6 +203,30 @@
     </ClCompile>
     <ClCompile Include="Graphics\DX11\DXExtension\DDSTextureLoader.cpp">
       <Filter>Empty\Graphics\DX11\DXExtension</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GL4\GLExtension\GLExtension.cpp">
+      <Filter>Empty\Graphics\GL4\GLExtension</Filter>
+    </ClCompile>
+    <ClCompile Include="Cache\TerrainCache.cpp">
+      <Filter>Empty\ResourceCache</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\VertexBuffer.cpp">
+      <Filter>Empty\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Cache\ModelCache.cpp">
+      <Filter>Empty\ResourceCache</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\TypeTransform.cpp">
+      <Filter>Empty\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="System\SubSystem.cpp">
+      <Filter>Empty\System</Filter>
+    </ClCompile>
+    <ClCompile Include="World\Terrain.cpp">
+      <Filter>Empty\World</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\BSP.cpp">
+      <Filter>Empty\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -277,12 +286,6 @@
     </ClInclude>
     <ClInclude Include="Renderer\batch\GL4\GLDebugBatch.h">
       <Filter>Empty\Renderer\Batch\GL4</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics\gl45\glextension\GLExtension.h">
-      <Filter>Empty\Graphics\GL4\GLExtension</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ContextDeform.h">
-      <Filter>Empty\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Model.h">
       <Filter>Empty\Graphics</Filter>
@@ -377,9 +380,6 @@
     <ClInclude Include="Window\GdiObject.h">
       <Filter>Empty\Window</Filter>
     </ClInclude>
-    <ClInclude Include="ECS\SubSystem.h">
-      <Filter>Empty\ECS</Filter>
-    </ClInclude>
     <ClInclude Include="renderer\Renderer.h">
       <Filter>Empty\Renderer</Filter>
     </ClInclude>
@@ -410,9 +410,6 @@
     <ClInclude Include="Cache\BufferCache.h">
       <Filter>Empty\ResourceCache</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Terrain.h">
-      <Filter>Empty\Common</Filter>
-    </ClInclude>
     <ClInclude Include="image\ImageTool.h">
       <Filter>Empty\Image</Filter>
     </ClInclude>
@@ -427,6 +424,33 @@
     </ClInclude>
     <ClInclude Include="Graphics\GL4\GLConfig.h">
       <Filter>Empty\Graphics\GL4</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GL4\GLExtension\GLExtension.h">
+      <Filter>Empty\Graphics\GL4\GLExtension</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache\TerrainCache.h">
+      <Filter>Empty\ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Buffer.h">
+      <Filter>Empty\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\VertexBuffer.h">
+      <Filter>Empty\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Cache\ModelCache.h">
+      <Filter>Empty\ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\TypeTransform.h">
+      <Filter>Empty\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="System\SubSystem.h">
+      <Filter>Empty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="World\Terrain.h">
+      <Filter>Empty\World</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\BSP.h">
+      <Filter>Empty\Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

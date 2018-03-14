@@ -3,7 +3,9 @@
 #include <Graphics/GL4/GLConfig.h>
 #include <Image/ImageTool.h>
 
-#include <Graphics/ContextDeform.h>
+#include <Graphics/TypeTransform.h>
+
+#include <Image/Image.h>
 
 GLTexture::GLTexture()
 	: mTexture(0)
@@ -12,13 +14,59 @@ GLTexture::GLTexture()
 
 GLTexture::~GLTexture()
 {
-
 	if (mTexture) glDeleteTextures(1, &mTexture);
 }
 
 void GLTexture::InitFromFile(const std::string& filename)
 {
 	ImageTool::LoadDDSFromFileToGL(filename, this);
+}
+
+void GLTexture::InitFromImage(const std::string& filename)
+{
+	Image image;
+	image.LoadFromFile(filename.c_str(), IMAGE_REQ_RGBA);		//request 4 componnent
+
+	//check graphical mipmap capbillity
+	width = image.GetWidth();
+	height = image.GetHeight();
+
+	glGenTextures(1, &mTexture);
+	glBindTexture(GL_TEXTURE_2D, mTexture);
+
+	glTextureParameteri(mTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(mTexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(mTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+	//test
+	switch (image.GetFormat())
+	{
+	case PixelFormat::R8:
+	{
+		//TODO : unpack aligned
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, image.GetWidth(), image.GetHeight(), 0,
+			GL_RED, GL_UNSIGNED_BYTE, (GLvoid*)image.GetData());
+		break;
+	}
+	case PixelFormat::RGB8:
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.GetWidth(), image.GetHeight(), 0,
+			GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)image.GetData());
+		break;
+	}
+	case PixelFormat::RGBA8:
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.GetWidth(), image.GetHeight(), 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)image.GetData());
+		break;
+	}
+	default:
+		ASSERT_MSG(0, "Invalid Image Format");
+		break;
+	}
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void GLTexture::Init(TextureCreateInfo& info)

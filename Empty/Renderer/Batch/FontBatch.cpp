@@ -15,7 +15,3 @@ FontBatch::~FontBatch()
 {
 }
 
-FontBatch* FontBatch::GetInstance()
-{
-	return globalFontBatch;
-}

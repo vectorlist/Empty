@@ -1,6 +1,6 @@
 #include <PCH.h>
 #include <window/application.h>
-#include <ECS/SubSystem.h>
+#include <System/SubSystem.h>
 #include <window/applicationinfo.h>
 
 #include <window/renderwindow.h>
@@ -86,8 +86,8 @@ int Application::Run()
 	Renderer* renderer = mRenderWindow->GetRenderer();
 
 	ShowWindow(mHandle, TRUE);
-	SetFocus(mRenderWindow->mHandle);
-	SetForegroundWindow(mRenderWindow->mHandle);
+	//SetFocus(mRenderWindow->mHandle);
+	//SetForegroundWindow(mRenderWindow->mHandle);
 
 	//::ShowCursor(FALSE);
 	

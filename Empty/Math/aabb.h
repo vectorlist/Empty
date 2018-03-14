@@ -27,8 +27,13 @@ struct AABB : public BSpehre
 	vec3f   GetMidPoint() const;
 	float	GetRadius() const;
 	
-	vec3f min;
-	vec3f max;
+	vec3f	min;
+	vec3f	max;
+
+	//test
+	vec3f	mVertices[8];
+	void	SetVertices(const vec3f& min, const vec3f& max);
+	bool	IsInsidePoint(const vec3f& p);
 };
 
 inline void AABB::Expand(const AABB& aabb)
@@ -69,5 +74,28 @@ inline vec3f AABB::GetMidPoint() const
 inline float AABB::GetRadius() const
 {
 	return ((max - min) * 0.5f).length();
+}
+
+inline void AABB::SetVertices(const vec3f& min, const vec3f& max)
+{
+	mVertices[0] = vec3f(min.x, min.y, min.z);
+	mVertices[1] = vec3f(max.x, min.y, min.z);
+	mVertices[2] = vec3f(min.x, max.y, min.z);
+	mVertices[3] = vec3f(max.x, max.y, min.z);
+	mVertices[4] = vec3f(min.x, min.y, max.z);
+	mVertices[5] = vec3f(max.x, min.y, max.z);
+	mVertices[6] = vec3f(min.x, max.y, max.z);
+	mVertices[7] = vec3f(max.x, max.y, max.z);
+}
+
+inline bool AABB::IsInsidePoint(const vec3f& p)
+{
+	if (p.x < mVertices[0].x) return false;
+	if (p.y < mVertices[0].y) return false;
+	if (p.z < mVertices[0].z) return false;
+	if (p.x > mVertices[7].x) return false;
+	if (p.y > mVertices[7].y) return false;
+	if (p.z > mVertices[7].z) return false;
+	return true;
 }
 

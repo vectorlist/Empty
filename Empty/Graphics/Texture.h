@@ -11,6 +11,7 @@ public:
 	virtual~Texture(){}
 
 	virtual void InitFromFile(const std::string& filename) = 0;
+	virtual void InitFromImage(const std::string& filename) = 0;
 
 	//TODO : binary byte for now (R8)
 	//TODO : From Bitmap data or dds

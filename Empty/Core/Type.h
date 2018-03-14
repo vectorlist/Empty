@@ -6,6 +6,7 @@
 
 typedef unsigned int	uint;
 typedef unsigned char	uint8;
+typedef unsigned int	Enum;
 
 //-------------------------- Buffer Type ---------------------------
 
@@ -71,15 +72,6 @@ struct UboMatrice
 	Matrix4x4 proj;
 	Matrix4x4 view;
 };
-
-struct Data0
-{
-	vec3f viewPos;		//12	//must be pack of 16bytes
-	float intensity;	//4
-	vec3f lightPos;		//12
-	float padding;		//4
-};//total 32
-
 
 //--------------------------- etc type -----------------------------------
 enum class GraphicAPI : uint
@@ -152,6 +144,73 @@ struct BufferCreateInfo
 	void*			pData;
 	uint 			size;
 	BufferType		type;
-	BufferBinding	binding;			//dont use at uniform buffer
+	BufferBinding	binding;
 };
 
+enum class InputType : uint
+{
+	BYTE = 0xFF,
+	INT,
+	UINT,
+	SHORT,
+	FLOAT,
+	DOUBLE
+};
+
+struct InputLayout
+{
+	uint slot;
+	InputType elementType;
+	uint elemintDemension;		//how many compponent type 
+	uint stride;
+	uint offset;
+};
+
+enum class Topolgy : Enum
+{
+	POINT = 0xF0F0,
+	LINE,
+	LINE_STRIP,
+	TRIANGLE,
+	TRIANGLE_STRIP,
+	QUAD
+};
+
+enum class VertexFormat : Enum
+{
+	BYTE = 0xFF,
+	INT,
+	UINT,
+	SHORT,
+	FLOAT,
+	DOUBLE
+};
+
+//TODO : slot index
+struct VertexInputAttib
+{
+	uint			location;
+	VertexFormat	format;
+	uint			formatSize;
+	uint			stride;
+	uint			offset;
+};
+//====================== Model ========================
+
+struct ModelCreateInfo
+{
+	void*				pVertices;
+	uint				verticesSize;
+	void*				pIndices;
+	uint				indicesSize;
+	VertexInputAttib*	pInputAttrib;
+	uint				inputAttibSize;
+};
+
+//==================== Node ===========================
+
+typedef struct TerrainNodeVertex
+{
+	vec3f pos;
+	vec3f normal;
+}NodeVertex;

@@ -8,10 +8,10 @@
 #include <cache/texturecache.h>
 #include <core/camera.h>
 
-#include <graphics/model.h>
 #include <core/input.h>
 
 #include <Image/Image.h>
+#include <Cache/ModelCache.h>
 
 FontBatchScene::FontBatchScene()
 {
@@ -24,7 +24,7 @@ void FontBatchScene::InitScene()
 
 	mCamera = new Camera(45.f, (float)v.w / (float)v.h);
 
-	mModel = Model::CreateModelFromFile("../data/model/knot.obj");
+	mModel = ModelCache::LoadModel("../data/model/knot.obj");
 
 	BufferCreateInfo info{};
 	info.pData = nullptr;
@@ -37,21 +37,7 @@ void FontBatchScene::InitScene()
 	mShader = ShaderCache::CreateSceneShader();
 	mTexture = TextureCache::LoadTexture("../data/texture/style.dds");
 
-	Image image;
 
-	image.LoadFromFile("../data/texture/127.bmp", IMAGE_REQ_RGB);
-	//image.LoadFromFile("../data/texture/texture.jpg", IMAGE_REQ_RGBA);
-
-	Mipmap mipmap;
-	if (!image.IsPow2())
-	{
-		image.CreateMipmaps(&mipmap);
-	}
-
-	uint8* ptr = mipmap.mPixels.get();
-
-	uint8 a = 10;
-	
 }
 
 void FontBatchScene::UpdateScene(float delta)
@@ -81,5 +67,5 @@ void FontBatchScene::RenderText()
 	for(int i =0; i < 1; ++i)
 		G_FontBatch->Render(10, i * 24, "ABDCEFGHIJKLMNOPQRSTUVWXYZ0123456789abcbefghijl", vec4f(1));
 
-	//G_FontBatch->Render(10, 10, "hello", vec4f(1));
+	G_FontBatch->Render(10, 10, "hello", vec4f(1));
 }

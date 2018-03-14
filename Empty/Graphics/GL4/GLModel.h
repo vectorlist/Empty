@@ -9,7 +9,7 @@ public:
 	virtual~GLModel();
 
 	void CreateBuffer(std::vector<Vertex> &vertice, std::vector<uint> &indice) override;
-	void CreateBuffer(Vertex* pVertices, uint vertexSize, uint* pIndices, uint indicesSize) override;
+	void CreateBuffer(ModelCreateInfo& info) override;
 	void Bind() override;
 	void Render() override;
 

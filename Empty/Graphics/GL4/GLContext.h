@@ -19,6 +19,9 @@ public:
 	void SetBlendState(bool enable) override;
 	void SetDepthStencil(bool enable) override;
 
+	void DrawArrays(VertexBuffer* buffer, uint count);
+
+	//============================================
 
 	HDC		mDc;			//handle of opengl device context
 	HGLRC	mRc;			//handle of Graphic redering context

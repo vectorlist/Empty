@@ -21,12 +21,13 @@ public:
 	void Bind() override;
 	void UnBind() override;
 
-	virtual void CreateInputLayout(ID3DBlob* vBlob) = 0;
+	virtual void CreateInputLayout(ID3DBlob* vBlob) {/* do nothing */};
 
 	void CompileFromFile(const std::string& file, const char* entry, const char* ver, ID3DBlob** blob);
 	void CompileFromCode(const char* code, const char* entry, const char* ver, ID3DBlob** blob);
 
 	ID3D11VertexShader*		mVShader;
 	ID3D11PixelShader*		mPShader;
+	//TODO : Remove InputLayout on Shader Side
 	ID3D11InputLayout*		mInputLaout;
 };

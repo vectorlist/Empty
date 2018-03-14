@@ -2,6 +2,7 @@
 #include <graphics/builtinshader.h>
 #include <graphics/context.h>
 
+//======================================= SCENE =======================================
 namespace glsl
 {
 	const char* sceneVS = R"(
@@ -72,6 +73,7 @@ void main()
 };	
 )";
 
+//======================================= AABB =======================================
 	const char* aabbVS = R"(
 #version 450 core
 
@@ -194,6 +196,8 @@ void main()
 };
 
 )";
+
+//======================================= FONT =======================================
 	const char* instanceFontVS = R"(
 #version 450 core
 

@@ -86,23 +86,53 @@ Shader* ShaderCache::CreateFontInstanceShader()
 	return shader.get();
 }
 
+#define WIN32_MEAN_AND_LEAN
+#include <Windows.h>
+
 Shader* ShaderCache::CreateShader(const std::string& vs, const std::string& fs)
 {
-	//TODO : Check available EXT
+	//TODO : Check Exists File already
+	std::string VS;
+	std::string PS;
+	//check what is current API
+	std::shared_ptr<Shader> shader = nullptr;
+	switch (G_Context->GetApiType())
+	{
+	case GraphicAPI::OPENGL45:
+	{
+		VS += vs + "." + "glsl";
+		if (!FileSystem::FileExist(VS)) {
+			ASSERT_MSG(0, (std::string("failed to find glsl file") + VS).c_str());
+		}
+		PS += fs + "." + "glsl";
+		if (!FileSystem::FileExist(VS)) {
+			ASSERT_MSG(0, (std::string("failed to find glsl file") + VS).c_str());
+		}
 
-	//TODO : check hlsl glsl for extension
-	auto vsExt = FileSystem::GetEXTFromPath(vs);
-
-	std::string vert;
-	std::string frag;
-	if (G_Context->GetApiType() == GraphicAPI::OPENGL45) {
-		//TODO : Get Relative Path and . Ext
-		vert = vs;
-
+		shader = std::make_shared<GLShader>();
+		shader->InitFromFile(VS.c_str(), PS.c_str());
+		mExternalShader.insert(std::make_pair(VS + PS, shader));
+		break;
 	}
+	
+	case GraphicAPI::DIRECTX11:
+	{
+		VS += vs + "." + "hlsl";
+		if (!FileSystem::FileExist(VS)) {
+			ASSERT_MSG(0, (std::string("failed to find hlsl file :") + VS).c_str());
+		}
+		PS += fs + "." + "hlsl";
+		if (!FileSystem::FileExist(VS)) {
+			ASSERT_MSG(0, (std::string("failed to find hlsl file : ") + VS).c_str());
+		}
 
-	//
+		shader = std::make_shared<DXShader>();
+		shader->InitFromFile(VS.c_str(), PS.c_str());
+		mExternalShader.insert(std::make_pair(VS + PS, shader));
+		break;
+	}
+	}
+	
 
-
-	return nullptr;
+	return shader.get();
 }

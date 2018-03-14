@@ -4,17 +4,23 @@
 #include <Math/math.h>
 
 Mipmap::Mipmap()
+	: mTotalPixels(0),mBytePerPixel(0)
+{
+}
+
+Mipmap::~Mipmap()
 {
 }
 
 bool Mipmap::GenerateMipmap(void* pixels, uint width, uint height, uint bytePerPixel)
 {
+	if (pixels == nullptr) return false;
 	mBytePerPixel = bytePerPixel;
-	//RGB for now and level 0 for now
+	
+	PixelArray srcPixels;
+	srcPixels.reset((uint8*)pixels);
 	uint srcW = width;
 	uint srcH = height;
-
-	//uint8* srcPixel = (uint8*)pixels;
 
 	//Check Pow2 Recalc size
 	if (!math::IsPowOf2(srcW) || !math::IsPowOf2(srcH))
@@ -22,11 +28,47 @@ bool Mipmap::GenerateMipmap(void* pixels, uint width, uint height, uint bytePerP
 		uint pow2W = math::RoundUpPow2(srcW);
 		uint pow2H = math::RoundUpPow2(srcH);
 
-		//prepare new pixels
 		PixelArray newPixels = RescalePixels((uint8*)pixels, srcW, srcH, pow2W, pow2H);
-		//auto p = ReP<RGBA8>((RGBA8*)pixels, srcW, srcH, pow2W, pow2H);
-		mPixels = std::move(newPixels);
+		srcPixels = std::move(newPixels);
+
+		srcW = pow2W;
+		srcH = pow2H;
 	}
+
+	uint maxLevel = math::FloorInt(std::max(math::LogF2((float)srcW), math::LogF2((float)srcH))) + 1;
+
+	uint totalByte = GetTotalMipmapByte(srcW, srcH, mBytePerPixel);
+
+	mTotalPixels = std::make_unique<uint8[]>(totalByte);
+	memcpy(mTotalPixels.get(), srcPixels.get(), sizeof(uint8) * srcW * srcH * mBytePerPixel);
+
+	mPixelBuffers = { { mTotalPixels.get(), srcW, srcH, mBytePerPixel } };
+
+	for (int i = 1; i < maxLevel; ++i)
+	{
+		PixelBuffer* buffer = &mPixelBuffers[i - 1];
+
+		uint dstW = std::max(1U, buffer->width >> 1);
+		uint dstH = std::max(1U, buffer->width >> 1);
+
+		PixelArray dstPixels = this->RescalePixels(buffer->pData, buffer->width, buffer->height, dstW, dstH);
+
+		auto dPtr = dstPixels.get();
+
+		uint offset = buffer->width * buffer->height * mBytePerPixel;
+		uint8* startPoint = buffer->pData + offset;
+
+		memcpy(startPoint, dstPixels.get(), sizeof(uint8) * dstW * dstH * mBytePerPixel);
+
+		PixelBuffer dstBuffer;
+		dstBuffer.pData = startPoint;
+		dstBuffer.width = dstW;
+		dstBuffer.height = dstH;
+		dstBuffer.bytePerPixel = mBytePerPixel;
+		mPixelBuffers.emplace_back(dstBuffer);
+
+	}
+
 
 	return true;
 }
@@ -89,6 +131,10 @@ PixelArray Mipmap::RescalePixels(uint8* srcPixels, uint srcW, uint srcH, uint ds
 	PixelArray dstPtr = PixelArray(new uint8[dstW * dstH * mBytePerPixel]);
 	memset(dstPtr.get(), 0, sizeof(uint8) * dstW * dstH * mBytePerPixel);
 	uint8* dstP = dstPtr.get();
+
+	R8*		dstP1 = (R8*)dstPtr.get();
+	RGB8*	dstP3 = (RGB8*)dstPtr.get();
+	RGBA8*	dstP4 = (RGBA8*)dstPtr.get();
 	R8*		srcP1 = (R8*)srcPixels;
 	RGB8*	srcP3 = (RGB8*)srcPixels;
 	RGBA8*	srcP4 = (RGBA8*)srcPixels;
@@ -97,33 +143,33 @@ PixelArray Mipmap::RescalePixels(uint8* srcPixels, uint srcW, uint srcH, uint ds
 	{
 		for (int s = 0; s < dstW; ++s)
 		{
-			int dstIndex = t * dstW + (s * mBytePerPixel);
+			int dstIndex = t * dstW + (s);
 			for (int i = 0; i < nSamples; ++i)
 			{
 				int srcT = math::ClampInt(tSampleIndex[t] + i, 0, srcH - 1);
 				for (int j = 0; j < nSamples; ++j)
 				{
 					int srcS = math::ClampInt(sSampleIndex[s] + j, 0, srcW - 1);
-					int srcIndex = srcT * srcW + srcS;
+					int srcIndex = srcT * srcW + (srcS);
 					float w = tSampleWeight[t * nSamples + i] * sSampleWeight[s * nSamples + j];
 					switch (mBytePerPixel)
 					{
 					case 1:
-						dstP[dstIndex] += w * srcP1[srcT * srcW + srcS].r;
+						dstP1[dstIndex].r += w * srcP1[srcT * srcW + srcS].r;
 						break;
 					case 2:
 						//incomplete
 						break;
 					case 3:
-						dstP[dstIndex + 0] += w * srcP3[srcIndex].r;
-						dstP[dstIndex + 1] += w * srcP3[srcIndex].g;
-						dstP[dstIndex + 2] += w * srcP3[srcIndex].b;
+						dstP3[dstIndex].r += w * srcP3[srcIndex].r;
+						dstP3[dstIndex].g += w * srcP3[srcIndex].g;
+						dstP3[dstIndex].b += w * srcP3[srcIndex].b;
 						break;
 					case 4:
-						dstP[dstIndex + 0] += w * srcP4[srcIndex].r;
-						dstP[dstIndex + 1] += w * srcP4[srcIndex].g;
-						dstP[dstIndex + 2] += w * srcP4[srcIndex].b;
-						dstP[dstIndex + 3] += w * srcP4[srcIndex].a;
+						dstP4[dstIndex].r += w * srcP4[srcIndex].r;
+						dstP4[dstIndex].g += w * srcP4[srcIndex].g;
+						dstP4[dstIndex].b += w * srcP4[srcIndex].b;
+						dstP4[dstIndex].a += w * srcP4[srcIndex].a;
 						break;
 					default:
 						break;
@@ -142,3 +188,27 @@ PixelArray Mipmap::RescalePixels(uint8* srcPixels, uint srcW, uint srcH, uint ds
 	return std::move(dstPtr);
 
 }
+
+PixelBuffer* Mipmap::GetPixelBuffer(uint level)
+{
+	if (mPixelBuffers.size() == 0) return nullptr;
+	uint index = std::max(0U, std::min(level, mPixelBuffers.size() - 1));
+
+	return &mPixelBuffers[index];
+}
+
+uint Mipmap::GetTotalMipmapByte(uint width, uint height, uint bytePerPixel)
+{
+	uint nBytes = width * height * bytePerPixel;
+	uint n = 0;
+	while (width > 1 && height > 1)
+	{
+		n++;
+		width = std::max(1U, width >> 1);
+		height = std::max(1U, height >> 1);
+		nBytes += width * height * bytePerPixel;
+	}
+
+	return nBytes;
+}
+

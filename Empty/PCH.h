@@ -65,3 +65,7 @@ typedef unsigned char	uint8;
 #define FONT_MAX_BATCH						65536
 #define FONT_MAX_CHAR						128
 #define FONT_MIN_CHAR						32
+
+
+//#define eprintf(format, ¡¦) fprintf (stderr, format, __VA_ARGS__)
+

@@ -3,7 +3,8 @@
 #include <graphics/context.h>
 #include <graphics/dx11/dxconfig.h>
 
-#include <graphics/contextdeform.h>
+#include <graphics/TypeTransform.h>
+#include <Image/Image.h>
 
 //TODO : Seperate Sampler and Texture
 ID3D11SamplerState* DXTexture::mSampler = nullptr;
@@ -42,6 +43,69 @@ void DXTexture::InitFromFile(const std::string& filename)
 
 	SAFE_RELEASE(res);
 	SAFE_RELEASE(tex);
+	CreateExternalSampler();
+}
+
+void DXTexture::InitFromImage(const std::string & filename)
+{
+	Image image;
+	image.LoadFromFile(filename.c_str());
+
+	this->width = image.GetWidth();
+	this->height = image.GetHeight();
+	//Translate desc
+
+	DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+
+	switch (image.GetFormat())
+	{
+	case PixelFormat::R8:
+		format = DXGI_FORMAT_R8_UNORM;
+		break;
+	case PixelFormat::RGB8:
+		ASSERT_MSG(0, "Invalid Image Format DirectX Dosen't Support 24 Bits");
+		break;
+	case PixelFormat::RGBA8:
+		format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		break;
+	default:
+		ASSERT_MSG(0 ,"Invalid Image Format");
+		break;
+	}
+	ID3D11Texture2D* texture2d = nullptr;
+	D3D11_TEXTURE2D_DESC desc{};
+	desc.Width = image.GetWidth();
+	desc.Height = image.GetHeight();
+	desc.MipLevels = 0;
+	desc.ArraySize = 1;
+	
+	desc.Format = format;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+	LOG_HR << mDevice->CreateTexture2D(&desc, nullptr, &texture2d);
+
+	uint rowPitch = (width * image.GetBytePerPixel()) * sizeof(uint8);
+	mContext->UpdateSubresource(texture2d, 0, NULL, image.GetData(), rowPitch, 0);
+
+
+	//create directx texture
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvInfo{};
+	srvInfo.Format = desc.Format;
+	srvInfo.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvInfo.Texture2D.MostDetailedMip = 0;
+	srvInfo.Texture2D.MipLevels = -1;			//generate mip map
+
+	LOG_HR << mDevice->CreateShaderResourceView(texture2d, &srvInfo, &mTexture);
+
+	mContext->GenerateMips(mTexture);
+
+	SAFE_RELEASE(texture2d);
+
 	CreateExternalSampler();
 }
 

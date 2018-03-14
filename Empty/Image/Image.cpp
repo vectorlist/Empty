@@ -6,8 +6,15 @@
 #include <STB/stb_image.h>
 
 Image::Image()
-	: mFormat(PixelFormat::UNKNOWN), mWidth(0), mHeight(0), mBytePerPixel(3)
+	: mFormat(PixelFormat::UNKNOWN), mWidth(0), mHeight(0), mBytePerPixel(4), mPixels(nullptr)
 {
+}
+
+Image::~Image()
+{
+	if (mPixels) {
+		mPixels.release();
+	}
 }
 
 void Image::LoadFromFile(const char* filename, uint requestBytePerPixel)
@@ -41,21 +48,22 @@ void Image::LoadFromFile(const char* filename, uint requestBytePerPixel)
 		format = PixelFormat::UNKNOWN;
 		break;
 	}
-
-	LOG << "Image Format : " << GetFormatStr(format) << ENDN;
-	LOG << "Width : " << w << ENDN;
-	LOG << "Height : " << h << ENDN;
-	LOG << "Graphically Mipmap gen count : " << GetGraphicsMipmapPossibilityCount(w, h) << ENDN;
-	LOG << "Pixel Mipmap gen count : " << GetPxielsMipmapPossibilityCount(w, h) << ENDN;
 	
 	mFormat = format;
 	mWidth = w;
 	mHeight = h;
 	//mPixels = std::unique_ptr<uint8[]>(std::move(buffer));
-	mPixels = std::make_unique<uint8[]>(w * h * mBytePerPixel);	
-	memcpy(mPixels.get(), buffer, w * h * mBytePerPixel);
+	mPixels = std::make_unique<uint8[]>(mWidth * mHeight * mBytePerPixel);	
+	memcpy(mPixels.get(), buffer, mWidth * mHeight * mBytePerPixel);
+
+	mPixelBuffer = { mPixels.get(), mWidth, mHeight, mBytePerPixel };
 
 	STBI_FREE(buffer);
+	LOG << "Image Format : " << GetFormatStr(format) << ENDN;
+	LOG << "Width : " << w << ENDN;
+	LOG << "Height : " << h << ENDN;
+	LOG << "Graphically Mipmap gen count : " << GetGraphicsMipmapPossibilityCount() << ENDN;
+	LOG << "Pixel Mipmap gen count : " << GetPxielsMipmapPossibilityCount(w, h) << ENDN;
 }
 
 PixelFormat Image::GetFormat() const
@@ -83,9 +91,24 @@ uint8* Image::GetData()
 	return mPixels.get();
 }
 
-uint Image::GetGraphicsMipmapPossibilityCount(uint width, uint height)
+PixelBuffer* Image::GetPixelBuffer()
+{
+	return &mPixelBuffer;
+}
+
+Mipmap* Image::CreateMipmaps()
+{
+	if (mMipmap.GenerateMipmap(this->GetData(), mWidth, mHeight, mBytePerPixel)) {
+		return &mMipmap;
+	}
+	return nullptr;
+}
+
+uint Image::GetGraphicsMipmapPossibilityCount() const
 {
 	uint  mipCount = 1;
+	uint width = mWidth;
+	uint height = mHeight;
 	while (width > 1 && height > 1)
 	{
 		width = std::max((uint)width / 2, 1U);
@@ -99,26 +122,19 @@ uint Image::GetPxielsMipmapPossibilityCount(uint width, uint height)
 {
 	uint pow2W = width;
 	uint pow2H = height;
+	uint nMipmap = 0;
 	if (!math::IsPowOf2(width) || !math::IsPowOf2(height))
 	{
 		pow2W = math::RoundUpPow2(width);
 		pow2H = math::RoundUpPow2(height);
 	}
-	return GetGraphicsMipmapPossibilityCount(pow2W, pow2H);
+	return nMipmap;
 }
 
 bool Image::IsPow2() const
 {
 	if (!math::IsPowOf2(mWidth) || !math::IsPowOf2(mHeight))
 	{
-		return false;
-	}
-	return true;
-}
-
-bool Image::CreateMipmaps(Mipmap* mipmap)
-{
-	if (!mipmap->GenerateMipmap(this->GetData(), mWidth, mHeight, mBytePerPixel)) {
 		return false;
 	}
 	return true;

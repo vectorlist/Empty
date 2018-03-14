@@ -10,6 +10,7 @@ public:
 	virtual~DXTexture();
 
 	void InitFromFile(const std::string& filename) override;
+	void InitFromImage(const std::string& filename)override;
 	void Init(TextureCreateInfo& info);
 	void Bind(uint index) override;
 

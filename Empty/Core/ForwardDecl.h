@@ -10,11 +10,19 @@ class Context;
 class Input;
 class Scene;
 class SceneCache;
-class Buffer;
 class Texture;
 class GLTexture;
 class DXTexture;
+
+class GLShader;
+class DXShader;
+
+class Terrain;
+
+//============ BUFFERS ============================
+class Buffer;
 class UniformBuffer;
+class VertexBuffer;
 
 //============ BATCH / RENDERER ===================
 class DebugBatch;
@@ -43,6 +51,7 @@ struct ID3D11Device;
 struct ID3D11DeviceContext;
 struct ID3D11ShaderResourceView;
 struct ID3D11Buffer;
+struct ID3D11InputLayout;
 
 //============== IMAGE ============================
 class Image;

@@ -26,7 +26,7 @@ public:
 
 	//Render Batch
 	virtual void EndBatch() = 0;
-	static FontBatch* GetInstance();
+	
 	static FontBatch* globalFontBatch;
 private:
 	

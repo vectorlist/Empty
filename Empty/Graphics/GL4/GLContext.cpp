@@ -34,7 +34,7 @@ void GLContext::Clear(float r, float g, float b, float a)
 void GLContext::SwapBuffer()
 {
 	SwapBuffers(mDc);
-	//mSwapChain->Present();
+	//wglSwapLayerBuffers(mDc, WGL_SWAP_MAIN_PLANE);
 }
 
 void GLContext::SetViewport(const Viewport& vp)
@@ -63,6 +63,12 @@ void GLContext::SetDepthStencil(bool enable)
 		glDisable(GL_DEPTH_TEST);
 }
 
+void GLContext::DrawArrays(VertexBuffer* buffer, uint count)
+{
+	//TODO : Raster Topology State
+	//glDrawArrays(,)
+}
+
 void GLContext::Init()
 {
 	if (!InitExtension()) return;
@@ -83,6 +89,20 @@ void GLContext::Init()
 			0
 		};
 
+		//pixelFormatAttribs =
+		//{
+		//	WGL_SAMPLE_BUFFERS_ARB, 0,
+		//	WGL_SAMPLES_ARB, 0,
+		//	WGL_SUPPORT_OPENGL_ARB, true,
+		//	WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+		//	WGL_DRAW_TO_WINDOW_ARB, true,
+		//	WGL_DOUBLE_BUFFER_ARB, true,
+		//	WGL_COLOR_BITS_ARB, 32,
+		//	WGL_DEPTH_BITS_ARB, 24,
+		//	WGL_STENCIL_BITS_ARB, 8,
+		//	0
+		//};
+
 		pixelFormatFloatAttribs = { 0.0f };
 
 		contextAttribs =
@@ -93,9 +113,9 @@ void GLContext::Init()
 			//WGL_CONTEXT_RELEASE
 			//TODO : newset opengl can avoid glflush with WGL_CONTEXT_RELEASE_BEHAVIOUR
 			//disable glFlush
-#ifndef _GLEW
+
 			WGL_CONTEXT_RELEASE_BEHAVIOR_ARB, WGL_CONTEXT_RELEASE_BEHAVIOR_NONE_ARB,
-#endif
+
 			//0x2098, 0x0000,
 			0
 		};

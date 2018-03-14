@@ -26,9 +26,7 @@ uint Object::GetId() const
 
 AABB Object::GetWorldAABB()
 {
-	//Get AABB from model(Local)
 	AABB& aabb = mModel->mAABB;
-	//AABB to World
 	return aabb.GetTransformedAABB(this->GetGlobal());
 }
 

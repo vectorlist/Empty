@@ -1,16 +1,9 @@
 #pragma once
 
+#include <Graphics/Buffer.h>
 #include <core/type.h>
 #include <vector>
 #include <memory>
-
-class Buffer 
-{
-public:
-	Buffer(){}
-	virtual~Buffer(){}
-
-};
 
 class UniformBuffer : public Buffer
 {
@@ -25,18 +18,4 @@ public:
 	virtual void BindPS(uint index) = 0;
 	
 private:
-};
-
-
-//TODO Vertex Buffer and Instancing Buffer
-class VertexBuffer : public Buffer
-{
-public:
-	virtual void Init(BufferCreateInfo& info) = 0;
-};
-
-struct VertexInstancingBuffer : public Buffer
-{
-public:
-	virtual void Init(BufferCreateInfo& info) = 0;
 };

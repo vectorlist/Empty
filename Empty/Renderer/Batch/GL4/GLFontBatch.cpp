@@ -96,7 +96,9 @@ void GLFontBatch::Render(int x, int y, const char* text, const vec4f& color)
 void GLFontBatch::EndBatch()
 {
 	//do not batch without begin
-	if (mIsBegin == false) return;
+	if (mIsBegin == false || mCurrentVtxIndexed == 0) {
+		return;
+	}
 	//Update Buffer by sized
 	//LOG_GR();
 	//Bind Shader
@@ -199,6 +201,7 @@ void GLFontBatch::CreateFontAndTexture(const char * filename, int size)
 
 		fonts[c].bl = (float)glyph->bitmap_left;
 		fonts[c].bt = (float)((glyph->metrics.horiBearingY - glyph->metrics.height) >> 6);
+		//fonts[c].bt = (float)((glyph->metrics.height - glyph->metrics.horiBearingY) >> 6);
 
 		fonts[c].uvx1 = (float)offsetx / (float)mWidth;
 		fonts[c].uvx2 = (float)(offsetx + glyph->bitmap.width) / (float)mWidth;

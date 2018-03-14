@@ -5,12 +5,9 @@
 enum class PixelFormat
 {
 	R8 = 0,
-	R16,
 	RG8,
 	RGB8,
-	RGB16,
 	RGBA8,
-	RGBA16,
 	UNKNOWN
 };
 
@@ -23,28 +20,28 @@ class Image
 {
 public:
 	Image();
-	~Image(){}
+	~Image();
 
 	void LoadFromFile(const char* filename, uint requestBytePerPixel = IMAGE_REQ_RGBA);
 
-	bool		IsPow2() const;
-	PixelFormat GetFormat() const;
-	uint		GetBytePerPixel() const;
-	uint		GetWidth() const;
-	uint		GetHeight() const;
-	std::string	GetFormatStr(PixelFormat format);
-	uint8*		GetData();
-	bool		CreateMipmaps(Mipmap* mipmap);
+	bool			IsPow2() const;
+	PixelFormat		GetFormat() const;
+	uint			GetBytePerPixel() const;
+	uint			GetWidth() const;
+	uint			GetHeight() const;
+	std::string		GetFormatStr(PixelFormat format);
+	uint8*			GetData();
+	PixelBuffer*	GetPixelBuffer();
+	Mipmap*			CreateMipmaps();
+	uint			GetGraphicsMipmapPossibilityCount() const;
 private:
-	//OpenGL , DirectX auto gen mipmap
-	uint GetGraphicsMipmapPossibilityCount(uint width, uint height);
-	//Force to Gen Mipmap menually by Pixels (with power of 2)
 	uint GetPxielsMipmapPossibilityCount(uint width, uint height);
-	//std::unique_ptr<RGBA8[]> mPixels;
-	std::unique_ptr<uint8[]> mPixels;
-
-	PixelFormat mFormat;
-	uint mBytePerPixel;
-	uint mWidth;
-	uint mHeight;
+	
+	std::unique_ptr<uint8[]>	mPixels;
+	PixelBuffer					mPixelBuffer;
+	PixelFormat					mFormat;
+	uint						mBytePerPixel;
+	uint						mWidth;
+	uint						mHeight;
+	Mipmap						mMipmap;
 };

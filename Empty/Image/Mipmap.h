@@ -18,30 +18,45 @@ struct RGBA8
 
 typedef std::unique_ptr<uint8[]>	PixelArray;
 
+struct MipmapData
+{
+	uint width;
+	uint height;
+	uint offset;		//starting point
+	uint size;			//size of this level byte 
+	uint8* pData;		//ptr of start pointer
+	uint bytePerPixel;
+};
+
+struct PixelBuffer
+{
+	uint8* pData;
+	uint width;
+	uint height;
+	uint bytePerPixel;
+};
+
 class Mipmap
 {
 public:
 	Mipmap();
+	~Mipmap();
 
 	bool GenerateMipmap(void* pixels, uint width, uint height, uint bytePerPixel);
-
-	uint mBytePerPixel;
-
-	PixelArray RescalePixels(uint8* srcPixels, uint srcW, uint srcH, uint dstW, uint dstH);
-
-	PixelArray mPixels;
+	PixelBuffer* GetPixelBuffer(uint level);
+private:
+	PixelArray	RescalePixels(uint8* srcPixels, uint srcW, uint srcH, uint dstW, uint dstH);
+	uint		GetTotalMipmapByte(uint witdh, uint height, uint bytePerPixel);
+	std::vector<PixelBuffer>	mPixelBuffers;
+	PixelArray					mTotalPixels;
+	uint						mBytePerPixel;
 };
-
-
-
-
-
-
 
 class Filter
 {
 public:
 	static float GuassianVertHori(float x, float y, float alpha = 2.0f);
+	//TODO BOX FILTER
 };
 
 //PBRT v3

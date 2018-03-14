@@ -31,7 +31,7 @@ void Scene::Render()
 
 	//priority DEBUG > SPRITE > FONT
 	//Gather Debug Batch
-	G_DebugBatch->RenderBatch();
+	//G_DebugBatch->RenderBatch();
 
 	//TODO : sprite batch
 	RenderSprite();
@@ -42,6 +42,8 @@ void Scene::Render()
 		RenderText();
 		G_FontBatch->EndBatch();
 	}
+
+	G_DebugBatch->RenderBatch();
 }
 
 Object* Scene::CreateSceneObject()

@@ -17,6 +17,7 @@ public:
 	virtual void SetDepthStencil(bool enable) = 0;
 
 	virtual void SetTexture(uint slot, Texture* texture) {}; // must be derived
+	virtual void DrawArrays(VertexBuffer* buffer, uint count) {};
 
 	//================== Internal =======================
 	void*			GetHwnd() const { return mHwnd; }

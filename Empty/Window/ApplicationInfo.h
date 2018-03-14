@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ECS/SubSystem.h>
+#include <System/SubSystem.h>
 
 struct Graphics
 {

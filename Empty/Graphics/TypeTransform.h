@@ -3,6 +3,7 @@
 #include <core/type.h>
 
 enum DXGI_FORMAT;
+
 namespace deform
 {
 	DXGI_FORMAT GetDXFormat(Format format);
@@ -11,6 +12,22 @@ namespace deform
 	uint		GetGLFormat(Format format);
 }
 
+
+typedef unsigned int GLenum;
+typedef unsigned char GLboolean;
+typedef signed char GLbyte;
+typedef int GLsizei;
+typedef unsigned int GLuint;
+
+namespace GLTransform
+{
+GLenum GetVertextFormat(VertexFormat format);
+}
+
+namespace DXTransform
+{
+DXGI_FORMAT GetVertexFormat(VertexFormat format, uint formatSize);
+}
 
 //#define GL_RED 0x1903
 //#define GL_GREEN 0x1904

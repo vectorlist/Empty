@@ -4,9 +4,9 @@ class Mesh
 {
 public:
 	std::vector<vec3f> vertices;
-	void SetIndexedVertices(Vertex* pVtx, uint* pIdx, uint idxSize)
+	void SetIndexedVertices(Vertex* pVtx, uint* pIdx, uint indicesSize)
 	{
-		for (uint i = 0; i < idxSize; ++i)
+		for (uint i = 0; i < indicesSize; ++i)
 		{
 			uint index = pIdx[i];
 			vec3f pos = pVtx[index].pos;
@@ -23,16 +23,13 @@ public:
 	virtual~Model(){}
 
 	virtual void CreateBuffer(std::vector<Vertex> &vertice, std::vector<uint>& indices) = 0;
-	virtual void CreateBuffer(Vertex* pVertices, uint vertexSize, uint* pIndices, uint indicesSize) = 0;
+	virtual void CreateBuffer(ModelCreateInfo& info) = 0;
 	virtual void Bind() {};
 	virtual void Render() {};
 
 	bool HasBuffer() const { return mHasBuffer; }
 	uint GetIndicesNum() const { return mIndiceNum; }
 	
-	static Model* CreateModel(std::vector<Vertex>& vertices, std::vector<uint>& indices);
-	static Model* CreateModelFromFile(const std::string& filename);
-
 	AABB mAABB;
 protected:
 	uint mIndiceNum;

@@ -52,7 +52,7 @@ void DXFontBatch::BeginBatch()
 	mCurrentVtxPtr = mVertices.get();
 }
 
-void DXFontBatch::Render(int x, int y, const char * text, const vec4f & color)
+void DXFontBatch::Render(int x, int y, const char * text, const vec4f& color)
 {
 	if (mIsBegin == false) return;
 	//Increate Current Vertice Index
@@ -83,7 +83,10 @@ void DXFontBatch::Render(int x, int y, const char * text, const vec4f & color)
 
 void DXFontBatch::EndBatch()
 {
-	if (mIsBegin == false) return;
+
+	if (mIsBegin == false || mCurrentVtxIndexed == 0) {
+		return;
+	}
 
 	//TODO : Update Buffer
 	D3D11_MAPPED_SUBRESOURCE mapped{};
@@ -179,12 +182,12 @@ void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
 		fonts[c].h = (float)glyph->bitmap.rows;
 
 		fonts[c].bl = (float)glyph->bitmap_left;
-		fonts[c].bt = (float)((glyph->metrics.horiBearingY - glyph->metrics.height) >> 6);
+		fonts[c].bt = (float)((glyph->metrics.height - glyph->metrics.horiBearingY) >> 6);
 
 		fonts[c].uvx1 = (float)offsetx / (float)mWidth;
-		fonts[c].uvx2 = (float)(offsetx + glyph->bitmap.width) / (float)mWidth;
-
 		fonts[c].uvy1 = (float)offsety / (float)mHeight;
+
+		fonts[c].uvx2 = (float)(offsetx + glyph->bitmap.width) / (float)mWidth;
 		fonts[c].uvy2 = (float)(offsety + glyph->bitmap.rows) / (float)mHeight;
 
 		offsetx += glyph->bitmap.width;

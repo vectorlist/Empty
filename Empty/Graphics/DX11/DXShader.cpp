@@ -3,6 +3,7 @@
 #include <graphics/context.h>
 
 DXShader::DXShader()
+	: mVShader(nullptr), mPShader(nullptr), mInputLaout(nullptr)
 {
 }
 
@@ -65,7 +66,9 @@ void DXShader::InitFromCode(const char* vs, const char* fs)
 
 void DXShader::Bind()
 {
-	G_DXContext->IASetInputLayout(mInputLaout);
+	if (mInputLaout) {
+		G_DXContext->IASetInputLayout(mInputLaout);
+	}
 	G_DXContext->VSSetShader(mVShader, 0, 0);
 	G_DXContext->PSSetShader(mPShader, 0, 0);
 }

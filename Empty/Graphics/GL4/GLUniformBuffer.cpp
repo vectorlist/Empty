@@ -26,19 +26,22 @@ void GLUnifomBuffer::Init(BufferCreateInfo& info)
 		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_STATIC_DRAW);
 		break;
 	case BufferType::BUFFER_DYNAMIC:
-		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_STATIC_DRAW);
 		break;
 	default:
 		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_DYNAMIC_DRAW);
 		break;
 	}
+	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, mSize);
 	glBindBuffer(GL_UNIFORM_BUFFER, NULL);
+	
 }
 
 void GLUnifomBuffer::Update(const void *data)
 {
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
 	glNamedBufferSubDataEXT(ubo, 0, mSize, data);
+	//glBufferSubData(GL_UNIFORM_BUFFER, 0, mSize, data);
 	glBindBuffer(GL_UNIFORM_BUFFER, NULL);
 }
 

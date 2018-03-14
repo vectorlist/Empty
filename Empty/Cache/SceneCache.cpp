@@ -26,12 +26,14 @@ void SceneCache::SetQueueScene(const std::string& name)
 
 void SceneCache::Update(float delta)
 {
-	if (currentScene) currentScene->Update(delta);
+	if (currentScene) 
+		currentScene->Update(delta);
 }
 
 void SceneCache::Render()
 {
-	if (currentScene) currentScene->Render();
+	if (currentScene)
+		currentScene->Render();
 }
 
 void SceneCache::ReleaseAll()
