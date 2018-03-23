@@ -28,7 +28,7 @@ CameraType Camera::GetType() const
 
 void Camera::Init()
 {
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		mProj = Matrix4x4::PerspectiveDXLH(mFovy, mAspect, mZnear, mZfar);

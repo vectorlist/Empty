@@ -9,7 +9,7 @@ public:
 	static Texture* CreateTexture(TextureCreateInfo& info);
 	static Texture* LoadTextureImage(const std::string& filename);
 
-	static std::unordered_map<std::string, std::shared_ptr<Texture>> mTextures;
-	static std::unordered_map<uint, std::shared_ptr<Texture>> mInternalTexture;
+	static std::unordered_map<std::string, std::shared_ptr<Texture>>	mTextures;
+	static std::unordered_map<uint, std::shared_ptr<Texture>>			mInternalTexture;
 	static uint mInternalTextureCount;
 };

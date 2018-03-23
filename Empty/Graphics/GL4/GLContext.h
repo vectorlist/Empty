@@ -21,6 +21,9 @@ public:
 
 	void DrawArrays(VertexBuffer* buffer, uint count);
 
+	//================== EXPAND API ================
+	void SetDepthStencilEx(DepthStencilState* state);
+
 	//============================================
 
 	HDC		mDc;			//handle of opengl device context

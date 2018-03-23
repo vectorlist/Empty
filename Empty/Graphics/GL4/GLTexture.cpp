@@ -36,7 +36,9 @@ void GLTexture::InitFromImage(const std::string& filename)
 
 	glTextureParameteri(mTexture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTextureParameteri(mTexture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTextureParameteri(mTexture, GL_TEXTURE_COMPARE_FUNC, GL_NEVER);
 	glTextureParameteri(mTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTextureParameteri(mTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	//test
 	switch (image.GetFormat())

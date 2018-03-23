@@ -29,7 +29,7 @@ public:
 
 	bool HasBuffer() const { return mHasBuffer; }
 	uint GetIndicesNum() const { return mIndiceNum; }
-	
+	AABB* GetAABB() { return &mAABB; }
 	AABB mAABB;
 protected:
 	uint mIndiceNum;

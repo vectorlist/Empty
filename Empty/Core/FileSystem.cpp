@@ -1,7 +1,7 @@
 #include <PCH.h>
 #include <core/FileSystem.h>
 
-static std::string SHADER_DIR = "../data/shader/";
+std::string FileSystem::SHADER_DIR = "../data/shader/";
 
 std::vector<std::string> FileSystem::GLSLEXT = {
 	"glsl", "GLSL", "vert","frag"

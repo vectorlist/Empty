@@ -3,7 +3,7 @@
 #include <core/type.h>
 
 enum DXGI_FORMAT;
-
+enum D3D_PRIMITIVE_TOPOLOGY;
 namespace deform
 {
 	DXGI_FORMAT GetDXFormat(Format format);
@@ -22,11 +22,13 @@ typedef unsigned int GLuint;
 namespace GLTransform
 {
 GLenum GetVertextFormat(VertexFormat format);
+GLenum GetTopology(Topology topology);
 }
 
 namespace DXTransform
 {
-DXGI_FORMAT GetVertexFormat(VertexFormat format, uint formatSize);
+DXGI_FORMAT				GetVertexFormat(VertexFormat format, uint formatSize);
+D3D_PRIMITIVE_TOPOLOGY	GetTopology(Topology topology);
 }
 
 //#define GL_RED 0x1903

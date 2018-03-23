@@ -47,6 +47,7 @@ typedef unsigned char	uint8;
 #include <unordered_map>
 #include <map>
 #include <assert.h>
+#include <array>
 
 //STATIC MATH
 #include <math/vec2f.h>
@@ -54,6 +55,8 @@ typedef unsigned char	uint8;
 #include <math/matrix4x4.h>
 #include <math/math.h>
 #include <math/aabb.h>
+//compile slow but easy to use every where
+#include <Math/frustum.h>
 
 //ETC
 #include <core/ForwardDecl.h>

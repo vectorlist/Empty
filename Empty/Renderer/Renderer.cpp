@@ -61,11 +61,11 @@ void Renderer::Init(uint width, uint height, void* hwnd, bool vsync)
 	{
 	case GraphicAPI::OPENGL45:
 		mFontBatch = new GLFontBatch;
-		mFontBatch->Init("../data/font/arial.ttf", 32);
+		mFontBatch->Init("../data/font/arial.ttf", 22);
 		break;
 	case GraphicAPI::DIRECTX11:
 		mFontBatch = new DXFontBatch;
-		mFontBatch->Init("../data/font/arial.ttf", 32);
+		mFontBatch->Init("../data/font/arial.ttf", 22);
 		break;
 	default:
 		ASSERT_MSG(0, "failed to create font batch");

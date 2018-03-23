@@ -13,6 +13,8 @@
 #include <Image/Image.h>
 #include <Cache/ModelCache.h>
 
+#include <Graphics/Context.h>
+
 FontBatchScene::FontBatchScene()
 {
 }
@@ -20,7 +22,7 @@ FontBatchScene::FontBatchScene()
 void FontBatchScene::InitScene()
 {
 	Viewport v;
-	G_Context->GetViewport(v);
+	GContext->GetViewport(v);
 
 	mCamera = new Camera(45.f, (float)v.w / (float)v.h);
 

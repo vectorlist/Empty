@@ -141,6 +141,9 @@
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="Graphics\BuiltInShader.cpp" />
     <ClCompile Include="Graphics\Context.cpp" />
+    <ClCompile Include="Graphics\DX11\DXVertexBuffer.cpp" />
+    <ClCompile Include="Graphics\GL4\GLVertexBuffer.cpp" />
+    <ClCompile Include="Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Graphics\TypeTransform.cpp" />
     <ClCompile Include="Graphics\DX11\DXConstantBuffer.cpp" />
     <ClCompile Include="Graphics\DX11\DXContext.cpp" />
@@ -155,19 +158,19 @@
     <ClCompile Include="Graphics\GL4\GLTexture.cpp" />
     <ClCompile Include="Graphics\GL4\GLUniformBuffer.cpp" />
     <ClCompile Include="Graphics\Model.cpp" />
-    <ClCompile Include="Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Image\Image.cpp" />
     <ClCompile Include="image\ImageTool.cpp" />
     <ClCompile Include="Image\Mipmap.cpp" />
-    <ClCompile Include="math\aabb.cpp" />
-    <ClCompile Include="math\frustum.cpp" />
-    <ClCompile Include="math\transform.cpp" />
+    <ClCompile Include="math\AABB.cpp" />
+    <ClCompile Include="math\Frustum.cpp" />
+    <ClCompile Include="math\Transform.cpp" />
     <ClCompile Include="PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Physics\BSP.cpp" />
     <ClCompile Include="physics\BVH.cpp" />
     <ClCompile Include="physics\Physics.cpp" />
+    <ClCompile Include="Physics\Tree\QuadTree.cpp" />
     <ClCompile Include="renderer\batch\DebugBatch.cpp" />
     <ClCompile Include="Renderer\batch\DX11\DXDebugBatch.cpp" />
     <ClCompile Include="renderer\batch\DX11\DXFontBatch.cpp" />
@@ -175,6 +178,7 @@
     <ClCompile Include="renderer\batch\FontBatch.cpp" />
     <ClCompile Include="Renderer\batch\GL4\GLDebugBatch.cpp" />
     <ClCompile Include="renderer\batch\GL4\GLFontBatch.cpp" />
+    <ClCompile Include="Renderer\Environment.cpp" />
     <ClCompile Include="renderer\Renderer.cpp" />
     <ClCompile Include="scene\Scene.cpp" />
     <ClCompile Include="System\SubSystem.cpp" />
@@ -206,6 +210,10 @@
     <ClInclude Include="Graphics\Buffer.h" />
     <ClInclude Include="Graphics\BuiltInShader.h" />
     <ClInclude Include="Graphics\Context.h" />
+    <ClInclude Include="Graphics\DX11\DXVertexBuffer.h" />
+    <ClInclude Include="Graphics\GL4\GLVertexBuffer.h" />
+    <ClInclude Include="Graphics\IndexBuffer.h" />
+    <ClInclude Include="Graphics\Sampler.h" />
     <ClInclude Include="Graphics\TypeTransform.h" />
     <ClInclude Include="Graphics\DX11\DXConfig.h" />
     <ClInclude Include="Graphics\DX11\DXConstantBuffer.h" />
@@ -229,12 +237,12 @@
     <ClInclude Include="Image\Image.h" />
     <ClInclude Include="image\ImageTool.h" />
     <ClInclude Include="Image\Mipmap.h" />
-    <ClInclude Include="math\aabb.h" />
-    <ClInclude Include="math\frustum.h" />
+    <ClInclude Include="Math\AABB.h" />
+    <ClInclude Include="math\Frustum.h" />
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\matrix4x4.h" />
     <ClInclude Include="math\quaternion.h" />
-    <ClInclude Include="math\transform.h" />
+    <ClInclude Include="math\Transform.h" />
     <ClInclude Include="math\vec2f.h" />
     <ClInclude Include="math\vec3f.h" />
     <ClInclude Include="math\vec4f.h" />
@@ -242,6 +250,8 @@
     <ClInclude Include="Physics\BSP.h" />
     <ClInclude Include="physics\BVH.h" />
     <ClInclude Include="physics\Physics.h" />
+    <ClInclude Include="Physics\Tree\QuadTree.h" />
+    <ClInclude Include="Physics\Tree\TreeNode.h" />
     <ClInclude Include="renderer\batch\DebugBatch.h" />
     <ClInclude Include="Renderer\batch\DX11\DXDebugBatch.h" />
     <ClInclude Include="renderer\batch\DX11\DXFontBatch.h" />
@@ -249,6 +259,7 @@
     <ClInclude Include="renderer\batch\FontBatch.h" />
     <ClInclude Include="Renderer\batch\GL4\GLDebugBatch.h" />
     <ClInclude Include="renderer\batch\GL4\GLFontBatch.h" />
+    <ClInclude Include="Renderer\Environment.h" />
     <ClInclude Include="renderer\Renderer.h" />
     <ClInclude Include="scene\scene.h" />
     <ClInclude Include="System\SubSystem.h" />
@@ -261,6 +272,16 @@
     <ClInclude Include="Window\TitleBar.h" />
     <ClInclude Include="Window\Window.h" />
     <ClInclude Include="World\Terrain.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\EnvironmentPS.glsl" />
+    <None Include="..\data\shader\EnvironmentPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\data\shader\EnvironmentVS.glsl" />
+    <None Include="..\data\shader\EnvironmentVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

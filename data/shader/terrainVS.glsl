@@ -23,6 +23,6 @@ out struct PS
 void main()
 {
 	gl_Position = proj * view  * vec4(pos,1);
-	//ps.normal = normal;
+	ps.normal = normal;
 	ps.st = st;
 }

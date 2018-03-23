@@ -48,7 +48,7 @@ public:
 			float m[4][4];
 		};
 		struct{
-			float mData[16];
+			float f[16];
 		};
 	};
 	
@@ -65,6 +65,7 @@ public:
 	void			SetToIdentity();
 
 	vec3f			Normal(const vec3f &n) const;
+	vec3f			TransformCoord(const vec3f& v) const;
 	Matrix4x4&		Transpose();
 	Matrix4x4		Transposed() const;
 	Matrix4x4		Inverted() const;
@@ -186,9 +187,13 @@ inline Matrix4x4& Matrix4x4::operator*=(const Matrix4x4 &other)
 inline vec3f Matrix4x4::operator*(const vec3f &v) const
 {
 	float x, y, z;
-	x = v.x * m[0][0] + v.y * m[0][1] + v.z * m[0][2] + m[0][3];
-	y = v.x * m[1][0] + v.y * m[1][1] + v.z * m[1][2] + m[1][3];
-	z = v.x * m[2][0] + v.y * m[2][1] + v.z * m[2][2] + m[2][3];
+	x = (v.x * m[0][0]) + (v.y * m[0][1]) + (v.z * m[0][2]) + m[0][3];
+	y = (v.x * m[1][0]) + (v.y * m[1][1]) + (v.z * m[1][2]) + m[1][3];
+	z = (v.x * m[2][0]) + (v.y * m[2][1]) + (v.z * m[2][2]) + m[2][3];
+	float w = (v.x * m[3][0]) + (v.y * m[3][1]) + (v.z * m[3][2]) + m[3][3];
+	x /= w;
+	y /= w;
+	z /= w;
 
 	return vec3f(x, y, z);
 }
@@ -415,74 +420,64 @@ inline const float* Matrix4x4::constData() const
 
 inline Matrix4x4 Matrix4x4::Inverted() const
 {
-	Matrix4x4 inv;
-	float m00 = m[0][0];
-	float m01 = m[0][1];
-	float m02 = m[0][2];
-	float m03 = m[0][3];
-	float m10 = m[1][0];
-	float m11 = m[1][1];
-	float m12 = m[1][2];
-	float m13 = m[1][3];
-	float m20 = m[2][0];
-	float m21 = m[2][1];
-	float m22 = m[2][2];
-	float m23 = m[2][3];
-	float m30 = m[3][0];
-	float m31 = m[3][1];
-	float m32 = m[3][2];
-	float m33 = m[3][3];
+	float inv[16], det;
 
-	float R23C23 = m22 * m33 - m23 * m32;
-	float R23C13 = m21 * m33 - m23 * m31;
-	float R23C12 = m21 * m32 - m22 * m31;
-	float R23C03 = m20 * m33 - m23 * m30;
-	float R23C02 = m20 * m32 - m22 * m30;
-	float R23C01 = m20 * m31 - m21 * m30;
+	inv[0] = f[5] * f[10] * f[15] - f[5] * f[11] * f[14] -
+		f[9] * f[6] * f[15] + f[9] * f[7] * f[14] +
+		f[13] * f[6] * f[11] - f[13] * f[7] * f[10];
+	inv[1] = -f[1] * f[10] * f[15] + f[1] * f[11] * f[14] +
+		f[9] * f[2] * f[15] - f[9] * f[3] * f[14] -
+		f[13] * f[2] * f[11] + f[13] * f[3] * f[10];
+	inv[2] = f[1] * f[6] * f[15] - f[1] * f[7] * f[14] -
+		f[5] * f[2] * f[15] + f[5] * f[3] * f[14] +
+		f[13] * f[2] * f[7] - f[13] * f[3] * f[6];
+	inv[3] = -f[1] * f[6] * f[11] + f[1] * f[7] * f[10] +
+		f[5] * f[2] * f[11] - f[5] * f[3] * f[10] -
+		f[9] * f[2] * f[7] + f[9] * f[3] * f[6];
+	inv[4] = -f[4] * f[10] * f[15] + f[4] * f[11] * f[14] +
+		f[8] * f[6] * f[15] - f[8] * f[7] * f[14] -
+		f[12] * f[6] * f[11] + f[12] * f[7] * f[10];
+	inv[5] = f[0] * f[10] * f[15] - f[0] * f[11] * f[14] -
+		f[8] * f[2] * f[15] + f[8] * f[3] * f[14] +
+		f[12] * f[2] * f[11] - f[12] * f[3] * f[10];
+	inv[6] = -f[0] * f[6] * f[15] + f[0] * f[7] * f[14] +
+		f[4] * f[2] * f[15] - f[4] * f[3] * f[14] -
+		f[12] * f[2] * f[7] + f[12] * f[3] * f[6];
+	inv[7] = f[0] * f[6] * f[11] - f[0] * f[7] * f[10] -
+		f[4] * f[2] * f[11] + f[4] * f[3] * f[10] +
+		f[8] * f[2] * f[7] - f[8] * f[3] * f[6];
+	inv[8] = f[4] * f[9] * f[15] - f[4] * f[11] * f[13] -
+		f[8] * f[5] * f[15] + f[8] * f[7] * f[13] +
+		f[12] * f[5] * f[11] - f[12] * f[7] * f[9];
+	inv[9] = -f[0] * f[9] * f[15] + f[0] * f[11] * f[13] +
+		f[8] * f[1] * f[15] - f[8] * f[3] * f[13] -
+		f[12] * f[1] * f[11] + f[12] * f[3] * f[9];
+	inv[10] = f[0] * f[5] * f[15] - f[0] * f[7] * f[13] -
+		f[4] * f[1] * f[15] + f[4] * f[3] * f[13] +
+		f[12] * f[1] * f[7] - f[12] * f[3] * f[5];
+	inv[11] = -f[0] * f[5] * f[11] + f[0] * f[7] * f[9] +
+		f[4] * f[1] * f[11] - f[4] * f[3] * f[9] -
+		f[8] * f[1] * f[7] + f[8] * f[3] * f[5];
+	inv[12] = -f[4] * f[9] * f[14] + f[4] * f[10] * f[13] +
+		f[8] * f[5] * f[14] - f[8] * f[6] * f[13] -
+		f[12] * f[5] * f[10] + f[12] * f[6] * f[9];
+	inv[13] = f[0] * f[9] * f[14] - f[0] * f[10] * f[13] -
+		f[8] * f[1] * f[14] + f[8] * f[2] * f[13] +
+		f[12] * f[1] * f[10] - f[12] * f[2] * f[9];
+	inv[14] = -f[0] * f[5] * f[14] + f[0] * f[6] * f[13] +
+		f[4] * f[1] * f[14] - f[4] * f[2] * f[13] -
+		f[12] * f[1] * f[6] + f[12] * f[2] * f[5];
+	inv[15] = f[0] * f[5] * f[10] - f[0] * f[6] * f[9] -
+		f[4] * f[1] * f[10] + f[4] * f[2] * f[9] +
+		f[8] * f[1] * f[6] - f[8] * f[2] * f[5];
 
-	inv[0][0] = +(m11 * R23C23 - m12 * R23C13 + m13 * R23C12);
-	inv[1][0] = -(m10 * R23C23 - m12 * R23C03 + m13 * R23C02);
-	inv[2][0] = +(m10 * R23C13 - m11 * R23C03 + m13 * R23C01);
-	inv[3][0] = -(m10 * R23C12 - m11 * R23C02 + m12 * R23C01);
-
-	float det = m00 * inv[0][0] + m01 * inv[1][0] +
-		m02 * inv[2][0] + m03 * inv[3][0];
-	if (fabs(det) < MATRIX_EPSILON) {
-
-	}
+	det = f[0] * inv[0] + f[1] * inv[4] + f[2] * inv[8] + f[3] * inv[12];
 	float invDet = 1.0f / det;
-
-	inv[0][1] = -(m01 * R23C23 - m02 * R23C13 + m03 * R23C12);
-	inv[1][1] = +(m00 * R23C23 - m02 * R23C03 + m03 * R23C02);
-	inv[2][1] = -(m00 * R23C13 - m01 * R23C03 + m03 * R23C01);
-	inv[3][1] = +(m00 * R23C12 - m01 * R23C02 + m02 * R23C01);
-
-	float R13C23 = m12 * m33 - m13 * m32;
-	float R13C13 = m11 * m33 - m13 * m31;
-	float R13C12 = m11 * m32 - m12 * m31;
-	float R13C03 = m10 * m33 - m13 * m30;
-	float R13C02 = m10 * m32 - m12 * m30;
-	float R13C01 = m10 * m31 - m11 * m30;
-
-	inv[0][2] = +(m01 * R13C23 - m02 * R13C13 + m03 * R13C12);
-	inv[1][2] = -(m00 * R13C23 - m02 * R13C03 + m03 * R13C02);
-	inv[2][2] = +(m00 * R13C13 - m01 * R13C03 + m03 * R13C01);
-	inv[3][2] = -(m00 * R13C12 - m01 * R13C02 + m02 * R13C01);
-
-	float R12C23 = m12 * m23 - m13 * m22;
-	float R12C13 = m11 * m23 - m13 * m21;
-	float R12C12 = m11 * m22 - m12 * m21;
-	float R12C03 = m10 * m23 - m13 * m20;
-	float R12C02 = m10 * m22 - m12 * m20;
-	float R12C01 = m10 * m21 - m11 * m20;
-
-	inv[0][3] = -(m01 * R12C23 - m02 * R12C13 + m03 * R12C12);
-	inv[1][3] = +(m00 * R12C23 - m02 * R12C03 + m03 * R12C02);
-	inv[2][3] = -(m00 * R12C13 - m01 * R12C03 + m03 * R12C01);
-	inv[3][3] = +(m00 * R12C12 - m01 * R12C02 + m02 * R12C01);
-
-	inv *= invDet;
-	return inv;
+	return Matrix4x4(
+		inv[0], inv[1], inv[2], inv[3],
+		inv[4], inv[5], inv[6], inv[7],
+		inv[8], inv[9], inv[10], inv[11],
+		inv[12], inv[13], inv[14], inv[15]) * invDet;
 }
 
 inline Matrix4x4 Matrix4x4::VulkanClip()
@@ -504,6 +499,19 @@ inline vec3f Matrix4x4::Normal(const vec3f &n) const
 	z = n.x * m[2][0] + n.y * m[2][1] + n.z * m[2][2];
 
 	return vec3f(x, y, z).normalized();
+}
+
+inline vec3f Matrix4x4::TransformCoord(const vec3f& v) const
+{
+	float x, y, z, w;
+	x = (v.x * m[0][0]) + (v.y * m[0][1]) + (v.z * m[0][2]) + m[0][3];
+	y = (v.x * m[1][0]) + (v.y * m[1][1]) + (v.z * m[1][2]) + m[1][3];
+	z = (v.x * m[2][0]) + (v.y * m[2][1]) + (v.z * m[2][2]) + m[2][3];
+	w = (v.x * m[3][0]) + (v.y * m[3][1]) + (v.z * m[3][2]) + m[3][3];
+	x /= w;
+	y /= w;
+	z /= w;
+	return vec3f(x, y, z);
 }
 
 inline Matrix4x4 Matrix4x4::RotationAxis(const vec3f& v, float angle)

@@ -19,12 +19,18 @@
     <ClCompile Include="Scene\ImageScene.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Scene\SkyScene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\FontBatchScene.h">
       <Filter>Source Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene\ImageScene.h">
+      <Filter>Source Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene\SkyScene.h">
       <Filter>Source Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>

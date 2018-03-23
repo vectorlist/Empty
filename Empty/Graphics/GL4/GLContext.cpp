@@ -55,8 +55,10 @@ void GLContext::SetBlendState(bool enable)
 		glDisable(GL_BLEND);
 }
 
+//TODO : More Info EX : EQUAL LESS OR MORE
 void GLContext::SetDepthStencil(bool enable)
 {
+	//TODO : Replace TO Depth Func
 	if (enable)
 		glEnable(GL_DEPTH_TEST);
 	else
@@ -67,6 +69,37 @@ void GLContext::DrawArrays(VertexBuffer* buffer, uint count)
 {
 	//TODO : Raster Topology State
 	//glDrawArrays(,)
+}
+
+void GLContext::SetDepthStencilEx(DepthStencilState* state)
+{
+	//TODO : Default for Debug warnnings
+	//Difference of DirectX11 Depth Stencil Test
+	switch (state->Enabled)
+	{
+	case true:
+		//glEnable(GL_STENCIL_TEST); 
+		glEnable(GL_DEPTH_TEST);
+		break;
+	case false:
+		//glDisable(GL_STENCIL_TEST); 
+		glDisable(GL_DEPTH_TEST);
+		break;
+	default:
+		break;
+	}
+	switch (state->Mask)
+	{
+	case DepthMask::NONE:
+		glDepthMask(false);
+		break;
+	case DepthMask::ALL:
+		glDepthMask(true); 
+		break;
+	default:
+		break;
+	}
+
 }
 
 void GLContext::Init()
@@ -161,6 +194,8 @@ void GLContext::Init()
 		//matching direct x clip space
 		//https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_clip_control.txt
 		glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
+		//Not Sure need glDepthRange to (0, 1)
+		glDepthRange(0.0f, 1.0f);
 	}
 
 	//------------------ gl state ---------------------------
@@ -170,6 +205,7 @@ void GLContext::Init()
 
 	//glDisable(GL_MULTISAMPLE);
 	//glEnable(GL_MULTISAMPLE);
+	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);

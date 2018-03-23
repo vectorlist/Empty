@@ -86,7 +86,7 @@ int Application::Run()
 	Renderer* renderer = mRenderWindow->GetRenderer();
 
 	ShowWindow(mHandle, TRUE);
-	//SetFocus(mRenderWindow->mHandle);
+	SetFocus(mRenderWindow->mHandle);
 	//SetForegroundWindow(mRenderWindow->mHandle);
 
 	//::ShowCursor(FALSE);

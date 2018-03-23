@@ -19,6 +19,10 @@ public:
 	virtual void SetTexture(uint slot, Texture* texture) {}; // must be derived
 	virtual void DrawArrays(VertexBuffer* buffer, uint count) {};
 
+	//============== Expand Graphics Func ===============
+
+	virtual void SetDepthStencilEx(DepthStencilState* stencilState) {};
+
 	//================== Internal =======================
 	void*			GetHwnd() const { return mHwnd; }
 	bool			GetVsync() const { return mVsync; }
@@ -41,7 +45,7 @@ protected:
 	GraphicAPI mApiType;
 };
 
-#define G_Context	Context::globalContext
+#define GContext	Context::globalContext
 
 #define G_DXDevice	Context::globalDXDevice
 #define G_DXContext  Context::globalDXDeviceContext

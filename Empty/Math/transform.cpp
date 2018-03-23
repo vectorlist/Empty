@@ -122,7 +122,6 @@ Matrix4x4& Transform::GetGlobal()
 
 void Transform::SetParent(Transform* parent)
 {
-	//new parent add child this
 	parent->AddChild(this);
 }
 
@@ -216,8 +215,8 @@ void Transform::RemoveParent()
 	//	0.f,0.f,0.f,1.f
 	//};
 
-	vec3f right = vec3f(mGlobal[0][0], mGlobal[1][0], mGlobal[2][0]).normalized();
-	vec3f up = vec3f(mGlobal[0][1], mGlobal[1][1], mGlobal[2][1]).normalized();
+	vec3f right =	vec3f(mGlobal[0][0], mGlobal[1][0], mGlobal[2][0]).normalized();
+	vec3f up =		vec3f(mGlobal[0][1], mGlobal[1][1], mGlobal[2][1]).normalized();
 	vec3f forward = vec3f(mGlobal[0][2], mGlobal[1][2], mGlobal[2][2]).normalized();
 
 	mAxis[0] = right;
@@ -230,7 +229,6 @@ void Transform::RemoveParent()
 void Transform::Update()
 {
 	if (!mAutoUpdate) return;
-
 
 	mLocal = {
 		mRight.x * mScale.x, mUp.x * mScale.y, mForward.x * mScale.z, mPosition.x,

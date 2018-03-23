@@ -24,7 +24,9 @@ public:
 	//virtual void RenderDebug() {};
 	
 	static Object* CreateSceneObject();
+	static Camera* CreateSceneCamera(const std::string& name, float fovy, float aspect, float znear = 0.1f, float zfar = 1000.f);
 private:
-	static std::map<uint, std::shared_ptr<Object>> 	mInternalObjects;
+	static std::map<uint, std::shared_ptr<Object>> 			mInternalObjects;
+	static std::map<std::string, std::shared_ptr<Camera>>	mInternalCameras;
 };
 

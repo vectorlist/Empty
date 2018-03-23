@@ -83,10 +83,11 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <AdditionalDependencies>freetype271d.lib;assimp-vc140-mt.lib;Empty.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -126,10 +127,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Scene\FontBatchScene.cpp" />
     <ClCompile Include="Scene\ImageScene.cpp" />
+    <ClCompile Include="Scene\SkyScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scene\FontBatchScene.h" />
     <ClInclude Include="Scene\ImageScene.h" />
+    <ClInclude Include="Scene\SkyScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Empty\Empty.vcxproj">

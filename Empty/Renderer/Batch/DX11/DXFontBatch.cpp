@@ -32,7 +32,7 @@ void DXFontBatch::Init(const char* filename, int size)
 	mUbo = BufferCache::CreateUniformBuffer(info);
 
 	Viewport v;
-	G_Context->GetViewport(v);
+	GContext->GetViewport(v);
 
 	Matrix4x4 screen = Matrix4x4::NDCToScreenZeroToOne(v.w, v.h);
 
@@ -99,21 +99,18 @@ void DXFontBatch::EndBatch()
 
 
 	uint stride = sizeof(FontInstanceVertex);
-	uint offset = 0;
-
-	//TODO : this group to GContext for shared vertex buffer
+	uint offset = 0;	
 	G_DXContext->IASetVertexBuffers(0, 1, &mVbo, &stride, &offset);
 	
 	//Bind Texture and Sampler
 	G_DXContext->PSSetShaderResources(0, 1, &mTexture);
-	auto sampler = static_cast<DXContext*>(G_Context)->state.samplerWarpState;
+	auto sampler = static_cast<DXContext*>(GContext)->state.samplerWarpState;
 	G_DXContext->PSSetSamplers(0, 1, &sampler);
-
-	uint instancingNum = mCurrentVtxIndexed;
 	
-	G_Context->SetBlendState(true);
-	G_DXContext->DrawInstanced(6, instancingNum, 0, 0);
-	G_Context->SetBlendState(false);
+	G_DXContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	GContext->SetBlendState(true);
+	G_DXContext->DrawInstanced(6, mCurrentVtxIndexed, 0, 0);
+	GContext->SetBlendState(false);
 }
 
 void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
@@ -211,9 +208,9 @@ void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
 	data.SysMemPitch = width;
 	data.SysMemSlicePitch = width * height;
 
-	ID3D11Texture2D* texture2D;
+	ID3D11Texture2D* texture2d;
 
-	LOG_HR << G_DXDevice->CreateTexture2D(&textureInfo, &data, &texture2D);
+	LOG_HR << G_DXDevice->CreateTexture2D(&textureInfo, &data, &texture2d);
 
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvInfo{};
 
@@ -222,9 +219,9 @@ void DXFontBatch::CreateFontAndTexture(const char * filename, int size)
 	srvInfo.Texture2D.MipLevels = 1;
 	srvInfo.Texture2D.MostDetailedMip = 0;
 
-	LOG_HR << G_DXDevice->CreateShaderResourceView(texture2D, &srvInfo, &mTexture);
+	LOG_HR << G_DXDevice->CreateShaderResourceView(texture2d, &srvInfo, &mTexture);
 
-	//Release all
+	SAFE_RELEASE(texture2d);
 	FT_Done_Face(face);
 	FT_Done_FreeType(lib);
 	delete[] buffer;

@@ -2,6 +2,7 @@
 
 #include <scene/scene.h>
 
+
 class ImageScene : public Scene
 {
 public:
@@ -14,6 +15,8 @@ public:
 	virtual void RenderText();
 
 	Camera* mCamera;
+	Camera* mCamera2;
+	Camera* currentCamera = nullptr;
 	Model* mModel;
 
 	Texture* mTexture;
@@ -26,5 +29,12 @@ public:
 	Texture* mImageTexture;
 
 	Terrain* mTerrain;
+
+	Shader* mTreeShader;
+	bool sphereIn = false;
+	bool aabbIn = false;
+	uint mRenderedVerticesCount = 0;
+
+	
 
 };

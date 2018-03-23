@@ -3,8 +3,6 @@
 #include <math/matrix4x4.h>
 #include <math/quaternion.h>
 
-//OPTIMIZE TRANSFORM WITH PARENT
-
 class Camera;
 class Transform
 {
@@ -20,13 +18,13 @@ public:
 	void MoveDirection(float x, float y, float z);
 	void MoveDirection(const vec3f& pos);
 
-
 	void SetRotation(float x, float y, float z);
 	void SetRotation(const Quaternion& quat);
 
 	void Rotate(float ax, float ay, float az);
 
-	vec3f GetPostion() const;
+	vec3f	GetPostion() const;
+	vec3f*	GetAxis() { return mAxis; }
 
 	Matrix4x4& GetLocal();
 	Matrix4x4& GetGlobal();
@@ -34,35 +32,24 @@ public:
 	virtual void Update();
 	friend class Camera;	//allow to access private for cmera
 	//TRANSFORM NODE
-	void SetParent(Transform* parent);
-	void AddChild(Transform* child);
-	void RemoveParent();
-	Transform* mParent;
-	Transform* mChild = nullptr;
-	Transform* mNext = nullptr;
+	void		SetParent(Transform* parent);
+	void		AddChild(Transform* child);
+	void		RemoveParent();
 
-	vec3f* GetAxis() { return mAxis; }
+	Transform*		mParent;
+	Transform*		mChild;
+	Transform*		mNext;
 private:
-	Matrix4x4 mLocal;
-	Matrix4x4 mGlobal;				//TODO : fix later local only for nnow
-
 	union{
-		struct{
-			vec3f mAxis[3];
-		};
-		struct{
-			vec3f mRight;			//shared memory adress mAxises
-			vec3f mUp;
-			vec3f mForward;
-		};
+	struct{ vec3f mAxis[3];};
+	struct{ vec3f mRight; vec3f mUp; vec3f mForward;};
 	};
+	static vec3f	sAxis[3];
 
-	vec3f mPosition;
-	vec3f mScale;
+	vec3f			mPosition;
+	vec3f			mScale;
+	Matrix4x4		mLocal;
+	Matrix4x4		mGlobal;		
 
-	bool mAutoUpdate;
-	/*static vec3f RIGHT;
-	static vec3f UP;
-	static vec3f FORWARD;*/
-	static vec3f sAxis[3];
+	bool			mAutoUpdate;
 };

@@ -25,6 +25,7 @@ public:
 	void LoadFromFile(const char* filename, uint requestBytePerPixel = IMAGE_REQ_RGBA);
 
 	bool			IsPow2() const;
+	bool			IsSqaure() const;
 	PixelFormat		GetFormat() const;
 	uint			GetBytePerPixel() const;
 	uint			GetWidth() const;
@@ -35,7 +36,6 @@ public:
 	Mipmap*			CreateMipmaps();
 	uint			GetGraphicsMipmapPossibilityCount() const;
 private:
-	uint GetPxielsMipmapPossibilityCount(uint width, uint height);
 	
 	std::unique_ptr<uint8[]>	mPixels;
 	PixelBuffer					mPixelBuffer;

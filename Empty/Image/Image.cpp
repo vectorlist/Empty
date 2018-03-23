@@ -63,7 +63,6 @@ void Image::LoadFromFile(const char* filename, uint requestBytePerPixel)
 	LOG << "Width : " << w << ENDN;
 	LOG << "Height : " << h << ENDN;
 	LOG << "Graphically Mipmap gen count : " << GetGraphicsMipmapPossibilityCount() << ENDN;
-	LOG << "Pixel Mipmap gen count : " << GetPxielsMipmapPossibilityCount(w, h) << ENDN;
 }
 
 PixelFormat Image::GetFormat() const
@@ -118,19 +117,6 @@ uint Image::GetGraphicsMipmapPossibilityCount() const
 	return mipCount;
 }
 
-uint Image::GetPxielsMipmapPossibilityCount(uint width, uint height)
-{
-	uint pow2W = width;
-	uint pow2H = height;
-	uint nMipmap = 0;
-	if (!math::IsPowOf2(width) || !math::IsPowOf2(height))
-	{
-		pow2W = math::RoundUpPow2(width);
-		pow2H = math::RoundUpPow2(height);
-	}
-	return nMipmap;
-}
-
 bool Image::IsPow2() const
 {
 	if (!math::IsPowOf2(mWidth) || !math::IsPowOf2(mHeight))
@@ -138,6 +124,11 @@ bool Image::IsPow2() const
 		return false;
 	}
 	return true;
+}
+
+bool Image::IsSqaure() const
+{
+	return mWidth == mHeight;
 }
 
 std::string Image::GetFormatStr(PixelFormat format)

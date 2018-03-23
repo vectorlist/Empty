@@ -2,33 +2,9 @@
 
 //TODO Terrain comnpare (BSP, QUADTREE, BVH) trees
 
-struct TerrainCreateInfo
-{
-	const char* fileName;
-	float		cellScale;
-	float		heightScale;
-	uint		nTiles;
-	uint		nSmooth;
-};
+#include <Physics/BSP.h>
+#include <Physics/Tree/QuadTree.h>
 
-struct TerrainVertex
-{
-	vec3f pos;
-	vec3f normal;
-	vec2f st;
-	vec2f uv;
-	vec3f binormal;
-	vec3f tangent;
-};
-
-struct TriangleIndex
-{
-	uint p0;
-	uint p1;
-	uint p2;
-};
-
-struct PixelBuffer;
 class Terrain
 {
 public:
@@ -70,18 +46,25 @@ public:
 	);
 	
 	Model* mModel;
-
-	//test;
-	Shader* mShader;
-
-	void TestRender();
-
-	
+	Shader* mShader;	
 	std::vector<TerrainVertex>		mVertices;
 
-	//TREE
 	vec3f mMin;
 	vec3f mMax;
 	std::vector<TerrainNodeVertex>	mNodeVertices;
+
+	//Test Trees
+	BSPTree mTree;
+	QuadTreeNode mQuadTree;
+
+	Camera* mCamera;
+
+	void Render(Frustum* frustum = nullptr);
+
+	struct 
+	{
+		uint renderedVertices = 0;
+		uint renderedNodes = 0;
+	}result;
 };
 

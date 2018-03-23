@@ -18,7 +18,7 @@ Texture* TextureCache::LoadTexture(const std::string& filename)
 
 	std::shared_ptr<Texture> texture = nullptr;
 
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		texture = std::make_shared<GLTexture>();
@@ -48,7 +48,7 @@ Texture* TextureCache::CreateTexture(TextureCreateInfo& info)
 
 	//couldnt found
 	std::shared_ptr<Texture> texture = nullptr;
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		//TODO
@@ -78,7 +78,7 @@ Texture* TextureCache::LoadTextureImage(const std::string& filename)
 
 	std::shared_ptr<Texture> texture = nullptr;
 
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		texture = std::make_shared<GLTexture>();

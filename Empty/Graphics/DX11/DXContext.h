@@ -23,6 +23,9 @@ public:
 
 	void SetTexture(uint slot, Texture* texture);
 
+	//=================== API Extension ======================
+
+	void SetDepthStencilEx(DepthStencilState* state);
 
 	//================= External =============================
 
@@ -58,9 +61,17 @@ public:
 		ID3D11SamplerState*			samplerClampState;		//for any of texture
 	}state;
 
+	struct 
+	{
+		ID3D11DepthStencilState*	depthStencilMaskedAll;
+		ID3D11DepthStencilState*	depthStencilMaskedNone;
+	}preState;
+
 private:
 	void Init();
 
 	void CreateDeviceAndContext();
 	void CreateStates();
+
+	void CreatePreBuiltStates();
 };

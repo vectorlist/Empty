@@ -1,20 +1,21 @@
 #pragma once
 
-#include <Graphics/DX11/DXConstantBuffer.h>
-#include <Graphics/GL4/GLUniformBuffer.h>
-
 #include <Graphics/VertexBuffer.h>
-//TODO : remove template
+#include <Graphics/UniformBuffer.h>
+#include <Graphics/IndexBuffer.h>
+
 class BufferCache
 {
 public:
 	BufferCache(){}
-	//TODO : Intergration all Buffer one CreateBuffer to Buffer
-	static UniformBuffer* CreateUniformBuffer(BufferCreateInfo& info);
-	static VertexBuffer* CreateVertexBuffer(BufferCreateInfo& info);
+
+	static UniformBuffer*	CreateUniformBuffer(BufferCreateInfo& info);
+	static VertexBuffer*	CreateVertexBuffer(VertexBufferCreateInfo* info);
+	static IndexBuffer*		CreateIndexBuffer(IndexBufferCreateInfo* info);
 
 	static std::vector<std::shared_ptr<Buffer>> mUniformBuffers;
 	static std::vector<std::shared_ptr<Buffer>> mVertexBuffers;
+	static std::vector<std::shared_ptr<Buffer>> mIndexBuffers;
 };
 
 

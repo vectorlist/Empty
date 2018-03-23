@@ -200,10 +200,9 @@ PixelBuffer* Mipmap::GetPixelBuffer(uint level)
 uint Mipmap::GetTotalMipmapByte(uint width, uint height, uint bytePerPixel)
 {
 	uint nBytes = width * height * bytePerPixel;
-	uint n = 0;
+
 	while (width > 1 && height > 1)
 	{
-		n++;
 		width = std::max(1U, width >> 1);
 		height = std::max(1U, height >> 1);
 		nBytes += width * height * bytePerPixel;

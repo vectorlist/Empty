@@ -2,16 +2,16 @@
 #include <math/aabb.h>
 
 //======================== SPHERE =================================
-BSpehre::BSpehre(const vec3f & min, const vec3f & max)
+BSpehre::BSpehre(const vec3f& min, const vec3f& max)
 {
-	//Get Local Center
+	//local contructor
 	mCenter = (min + max) * 0.5;
 	mHalf = (max * min) * 0.5;
 	mRadius = (mCenter - min).length();
 }
 
 //GET WORLD CAENTER, RADIUS FROM LOCAL
-void BSpehre::GetWorldCenterRadius(const Matrix4x4 & world, vec3f * pCenter, float * pRadius)
+void BSpehre::GetWorldCenterRadius(const Matrix4x4& world, vec3f * pCenter, float * pRadius)
 {
 	*pCenter = world * mCenter;
 	*pRadius = mHalf.length();

@@ -58,17 +58,23 @@
     <Filter Include="Empty\World">
       <UniqueIdentifier>{51d31c3a-ffed-48ba-86e6-b788c66ef854}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Empty\Physics\Tree">
+      <UniqueIdentifier>{9fd03843-a69c-4671-a348-088366d53170}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Empty\External">
+      <UniqueIdentifier>{dba591f5-e75a-4d00-bc18-dddb576fb6d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Empty\External\Shader">
+      <UniqueIdentifier>{87c31d3a-6191-452c-be49-83e103bad74c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Empty\External\Shader\HLSL">
+      <UniqueIdentifier>{c19e9401-fc21-4142-956d-1c078fd7a750}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Empty\External\Shader\GLSL">
+      <UniqueIdentifier>{5e858fb0-840e-42d6-90cb-09baadb52005}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="math\transform.cpp">
-      <Filter>Empty\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\aabb.cpp">
-      <Filter>Empty\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="math\frustum.cpp">
-      <Filter>Empty\Math</Filter>
-    </ClCompile>
     <ClCompile Include="PCH.cpp">
       <Filter>Empty</Filter>
     </ClCompile>
@@ -210,9 +216,6 @@
     <ClCompile Include="Cache\TerrainCache.cpp">
       <Filter>Empty\ResourceCache</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\VertexBuffer.cpp">
-      <Filter>Empty\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Cache\ModelCache.cpp">
       <Filter>Empty\ResourceCache</Filter>
     </ClCompile>
@@ -227,6 +230,30 @@
     </ClCompile>
     <ClCompile Include="Physics\BSP.cpp">
       <Filter>Empty\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Frustum.cpp">
+      <Filter>Empty\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\AABB.cpp">
+      <Filter>Empty\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\Transform.cpp">
+      <Filter>Empty\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GL4\GLVertexBuffer.cpp">
+      <Filter>Empty\Graphics\GL4</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX11\DXVertexBuffer.cpp">
+      <Filter>Empty\Graphics\DX11</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\IndexBuffer.cpp">
+      <Filter>Empty\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\Tree\QuadTree.cpp">
+      <Filter>Empty\Physics\Tree</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer\Environment.cpp">
+      <Filter>Empty\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -243,15 +270,6 @@
       <Filter>Empty\Math</Filter>
     </ClInclude>
     <ClInclude Include="math\quaternion.h">
-      <Filter>Empty\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\transform.h">
-      <Filter>Empty\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\aabb.h">
-      <Filter>Empty\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="math\frustum.h">
       <Filter>Empty\Math</Filter>
     </ClInclude>
     <ClInclude Include="PCH.h">
@@ -452,5 +470,49 @@
     <ClInclude Include="Physics\BSP.h">
       <Filter>Empty\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="math\Frustum.h">
+      <Filter>Empty\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\AABB.h">
+      <Filter>Empty\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="math\Transform.h">
+      <Filter>Empty\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GL4\GLVertexBuffer.h">
+      <Filter>Empty\Graphics\GL4</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX11\DXVertexBuffer.h">
+      <Filter>Empty\Graphics\DX11</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Tree\TreeNode.h">
+      <Filter>Empty\Physics\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\Tree\QuadTree.h">
+      <Filter>Empty\Physics\Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\IndexBuffer.h">
+      <Filter>Empty\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer\Environment.h">
+      <Filter>Empty\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Sampler.h">
+      <Filter>Empty\Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\EnvironmentPS.hlsl">
+      <Filter>Empty\External\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\EnvironmentVS.hlsl">
+      <Filter>Empty\External\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\EnvironmentPS.glsl">
+      <Filter>Empty\External\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\EnvironmentVS.glsl">
+      <Filter>Empty\External\Shader\GLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>

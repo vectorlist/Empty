@@ -17,7 +17,7 @@ Shader* ShaderCache::CreateSceneShader()
 
 	std::shared_ptr<Shader> shader = nullptr;
 
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		shader = std::make_shared<GLInternalShader>();
@@ -43,7 +43,7 @@ Shader* ShaderCache::CreateAABBShader()
 
 	std::shared_ptr<Shader> shader = nullptr;
 
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		shader = std::make_shared<GLInternalShader>();
@@ -69,7 +69,7 @@ Shader* ShaderCache::CreateFontInstanceShader()
 
 	std::shared_ptr<Shader> shader = nullptr;
 
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		shader = std::make_shared<GLInternalShader>();
@@ -96,15 +96,15 @@ Shader* ShaderCache::CreateShader(const std::string& vs, const std::string& fs)
 	std::string PS;
 	//check what is current API
 	std::shared_ptr<Shader> shader = nullptr;
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 	{
-		VS += vs + "." + "glsl";
+		VS += FileSystem::SHADER_DIR + vs + "." + "glsl";
 		if (!FileSystem::FileExist(VS)) {
 			ASSERT_MSG(0, (std::string("failed to find glsl file") + VS).c_str());
 		}
-		PS += fs + "." + "glsl";
+		PS += FileSystem::SHADER_DIR + fs + "." + "glsl";
 		if (!FileSystem::FileExist(VS)) {
 			ASSERT_MSG(0, (std::string("failed to find glsl file") + VS).c_str());
 		}
@@ -117,11 +117,11 @@ Shader* ShaderCache::CreateShader(const std::string& vs, const std::string& fs)
 	
 	case GraphicAPI::DIRECTX11:
 	{
-		VS += vs + "." + "hlsl";
+		VS += FileSystem::SHADER_DIR + vs + "." + "hlsl";
 		if (!FileSystem::FileExist(VS)) {
 			ASSERT_MSG(0, (std::string("failed to find hlsl file :") + VS).c_str());
 		}
-		PS += fs + "." + "hlsl";
+		PS += FileSystem::SHADER_DIR + fs + "." + "hlsl";
 		if (!FileSystem::FileExist(VS)) {
 			ASSERT_MSG(0, (std::string("failed to find hlsl file : ") + VS).c_str());
 		}

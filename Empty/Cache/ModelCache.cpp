@@ -21,7 +21,7 @@ Model* ModelCache::LoadModel(const std::string &filename)
 	if (found == mExternalModels.end()) {
 		std::shared_ptr<Model> model = nullptr;
 
-		switch (G_Context->GetApiType())
+		switch (GContext->GetApiType())
 		{
 		case GraphicAPI::OPENGL45:
 			model = std::make_shared<GLModel>();
@@ -47,7 +47,7 @@ Model* ModelCache::CreateModel(ModelCreateInfo& info)
 	static uint internalCount = 0;
 
 	std::shared_ptr<Model> model = nullptr;
-	switch (G_Context->GetApiType())
+	switch (GContext->GetApiType())
 	{
 	case GraphicAPI::OPENGL45:
 		model = std::make_shared<GLModel>();

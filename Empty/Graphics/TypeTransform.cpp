@@ -88,6 +88,24 @@ GLenum GetVertextFormat(VertexFormat format)
 		return GL_NONE;
 	}
 }
+GLenum GetTopology(Topology topology)
+{
+	switch (topology)
+	{
+	case Topology::POINT:
+		return GL_POINTS;
+	case Topology::LINE:
+		return GL_LINES;
+	case Topology::LINE_STRIP:
+		return GL_LINE_STRIP;
+	case Topology::TRIANGLE:
+		return GL_TRIANGLES;
+	case Topology::TRIANGLE_STRIP:
+		return GL_TRIANGLE_STRIP;
+	default:
+		return GL_NONE;
+	}
+}
 }
 
 namespace DXTransform
@@ -173,6 +191,25 @@ DXGI_FORMAT GetVertexFormat(VertexFormat format, uint formatSize)
 	default:
 		ASSERT_MSG(0, "Invalid type");
 		break;
+	}
+}
+
+D3D_PRIMITIVE_TOPOLOGY GetTopology(Topology topology)
+{
+	switch (topology)
+	{
+	case Topology::POINT:
+		return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+	case Topology::LINE:
+		return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+	case Topology::LINE_STRIP:
+		return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+	case Topology::TRIANGLE:
+		return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	case Topology::TRIANGLE_STRIP:
+		return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+	default:
+		return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 	}
 }
 }

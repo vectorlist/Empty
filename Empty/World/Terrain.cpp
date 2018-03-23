@@ -15,7 +15,7 @@ Terrain::Terrain()
 void Terrain::Init(TerrainCreateInfo& info)
 {
 	Image image;
-	image.LoadFromFile(info.fileName, IMAGE_REQ_RGBA);
+	image.LoadFromFile(info.Filename, IMAGE_REQ_RGBA);
 
 	//pixel set by image
 	PixelBuffer* buffer = image.GetPixelBuffer();
@@ -37,11 +37,11 @@ void Terrain::Init(TerrainCreateInfo& info)
 	mCellNum = mCellNumX * mCellNumZ;
 
 	mTotalTriNum = mCellNum * 2;
-	mCellScale = info.cellScale;
-	mHeightScale = info.heightScale;
+	mCellScale = info.CellScale;
+	mHeightScale = info.HeightScale;
 
 	
-	mShader = ShaderCache::CreateShader("../data/shader/terrainVS", "../data/shader/terrainPS");
+	mShader = ShaderCache::CreateShader("terrainVS", "terrainPS");
 
 	CreateTerrain(info.nTiles, buffer, info.nSmooth);
 
@@ -87,7 +87,7 @@ void Terrain::CreateTerrain(uint nTile, PixelBuffer* buffer, uint nSmooth)
 			mVertices[index].uv = uv;
 		}
 	}
-
+	
 	//Get Indices
 	std::vector<TriangleIndex> triIndices(mTotalTriNum);
 
@@ -167,11 +167,11 @@ void Terrain::CreateTerrain(uint nTile, PixelBuffer* buffer, uint nSmooth)
 	//Model Create
 	ModelCreateInfo info{};
 	info.pVertices = mVertices.data();
-	info.verticesSize = mVertices.size() * sizeof(TerrainVertex);
+	info.VerticesSize = mVertices.size() * sizeof(TerrainVertex);
 	info.pIndices = triIndices.data();
-	info.indicesSize = triIndices.size() * 3 * sizeof(uint);
+	info.IndicesSize = triIndices.size() * 3 * sizeof(uint);
 
-	std::vector<VertexInputAttib> inputs = {
+	std::vector<VertexAttrib> inputs = {
 		{ 0, VertexFormat::FLOAT, 3, sizeof(TerrainVertex), offsetof(TerrainVertex, TerrainVertex::pos)},
 		{ 0, VertexFormat::FLOAT, 3, sizeof(TerrainVertex), offsetof(TerrainVertex, TerrainVertex::normal) },
 		{ 0, VertexFormat::FLOAT, 2, sizeof(TerrainVertex), offsetof(TerrainVertex, TerrainVertex::st) },
@@ -180,8 +180,8 @@ void Terrain::CreateTerrain(uint nTile, PixelBuffer* buffer, uint nSmooth)
 		{ 0, VertexFormat::FLOAT, 3, sizeof(TerrainVertex), offsetof(TerrainVertex, TerrainVertex::tangent) }
 	};
 
-	info.pInputAttrib = inputs.data();
-	info.inputAttibSize = inputs.size();
+	info.pAttrib = inputs.data();
+	info.AttribSize = inputs.size();
 
 	mModel = ModelCache::CreateModel(info);
 
@@ -197,6 +197,16 @@ void Terrain::CreateTerrain(uint nTile, PixelBuffer* buffer, uint nSmooth)
 	//dont need huge data anymore
 	mVertices.clear();
 
+	//BSP
+	mTree.Init(mNodeVertices.data(), mNodeVertices.size(),
+		(uint*)triIndices.data(), triIndices.size() * 3,
+		mMin, mMax, 32.f);
+
+	//QuadTree
+	//uint size = mMin.x - mMax.x;		//x z must equal
+	uint size = mVertexNumX;
+
+	mQuadTree.Init(mNodeVertices.data(), size);
 
 }
 
@@ -424,15 +434,21 @@ void Terrain::EvalBiNormalAndTangent(
 		dstBinormal[i] = B;
 		dstTangent[i] = T;
 	}
-
-	int g = 10;
 }
 
-void Terrain::TestRender()
-{
-	mShader->Bind();
 
-	mModel->Render();
+void Terrain::Render(Frustum* frustum)
+{
+	//two waty to render
+	if (frustum == nullptr) {
+		//Brute Force Render
+		mShader->Bind();
+		mModel->Render();
+		return;
+	}
+	result.renderedVertices = mTree.QueryRenderableNode(*frustum);
+	//Query Visible Node Render
+	mTree.QueryRender();
 }
 
 

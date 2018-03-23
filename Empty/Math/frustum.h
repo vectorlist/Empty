@@ -5,69 +5,99 @@
 
 struct Plane
 {
-	float x, y, z, d;
-	Plane Normalized();
+	vec3f n;
+	float d;
+	Plane&	Normalize();
+	Plane	Normalized();
+	__forceinline float& operator[](unsigned int index) {
+		assert(index >= 0 && index <= 3);
+		return (&n.x)[index];
+	}
+	__forceinline float operator[](unsigned int index) const {
+		assert(index >= 0 && index <= 3);
+		return (&n.x)[index];
+	}
 };
+
+//normalize Itself
+inline Plane& Plane::Normalize()
+{
+	float len = sqrtf(n.x * n.x + n.y * n.y + n.z * n.z);
+	float invLen = 1.0f / len;
+	this->n = this->n * invLen;
+	this->d = this->d * invLen;
+	return *this;
+}
 
 inline Plane Plane::Normalized()
 {
-	float len = sqrtf(x * x + y * y + z * z);
+	float len = sqrtf(n.x * n.x + n.y * n.y + n.z * n.z);
 	float invLen = 1.0f / len;
-	
-	this->x = x * invLen;
-	this->y = y * invLen;
-	this->z = z * invLen;
-	this->d = d * invLen;
+	Plane plane;
+	plane.n = this->n * invLen;
+	plane.d = this->d * invLen;
+	return plane;
 }
+
+#define PLANE_FRONT		0U
+#define PLANE_BACK		1U
+#define PLANE_LEFT		2U
+#define PLANE_RIGHT		3U
+#define PLANE_TOP		4U
+#define PLANE_BOTTOM	5U
+#define PLANE_MAX		6U
 
 struct Frustum
 {
-	enum {};
-	//TODO Extract Planes(view matrix, proj matrix)
+	void Extract(const Matrix4x4& proj, const Matrix4x4& view);
+	void ExtractWithScreenDepth(const Matrix4x4& proj, const Matrix4x4& view, float depth);
+	//Plane N to Inside ot outside
+	void ExtractPlane(const vec3f& p0, const vec3f& p1, const vec3f& p2, Plane* dstPlane, bool isInside = true);
 
-	void ExtractPlanes(const Matrix4x4& proj, const Matrix4x4& view);
 
-	vec4f mPlanes[6];
+
+	Plane mPlane[PLANE_MAX];
+	vec3f mVertices[8];		
+
+	static vec3f NDC[8];
+
+	float PlaneDot(const Plane& plane, const vec3f& point);
+
+	//in bound normal mothod
+	bool IsInAABBSphere(const vec3f& center, const float radius);
+	bool IsInAABB(AABB* aabb);
+	bool IsInPoint(const vec3f& point);
+
+	//outside method
+	bool IsOutAABBSphere(const vec3f& center, const float radius);
+	bool IsOutAABBCenterRadius(const vec3f& center, const float radius);
+	bool IsOutPoint(const vec3f& point);
 };
 
+//emonstrates the fact that the conversion of the AABB to the bounding 
+//sphere is not exact. If we measure the entire radius of the sphere 
+//and the distance from the center of the AABB we can see that we only need to compare its projection to the direction of the normal vector of the tested plane. There is one more dot product compared with the simple sphere-plane test. The following 
+//pseudo-code describes more implementation details of this method:
 
-// Now that we have our modelview and projection matrix, if we combine these 2 matrices,
-// it will give us our clipping planes.  To combine 2 matrices, we multiply them.
 
-//clip[0] = modl[0] * proj[0] + modl[1] * proj[4] + modl[2] * proj[8] + modl[3] * proj[12];
-//clip[1] = modl[0] * proj[1] + modl[1] * proj[5] + modl[2] * proj[9] + modl[3] * proj[13];
-//clip[2] = modl[0] * proj[2] + modl[1] * proj[6] + modl[2] * proj[10] + modl[3] * proj[14];
-//clip[3] = modl[0] * proj[3] + modl[1] * proj[7] + modl[2] * proj[11] + modl[3] * proj[15];
+//int AABBvsFrustum(AABB *b, FRUSTUM *f)
+//{
+//	float m, n; int i, result = INSIDE;
 //
-//clip[4] = modl[4] * proj[0] + modl[5] * proj[4] + modl[6] * proj[8] + modl[7] * proj[12];
-//clip[5] = modl[4] * proj[1] + modl[5] * proj[5] + modl[6] * proj[9] + modl[7] * proj[13];
-//clip[6] = modl[4] * proj[2] + modl[5] * proj[6] + modl[6] * proj[10] + modl[7] * proj[14];
-//clip[7] = modl[4] * proj[3] + modl[5] * proj[7] + modl[6] * proj[11] + modl[7] * proj[15];
+//	for (i = 0; i < 6; i++) {
+//		PLANE *p = f->plane + i;
 //
-//clip[8] = modl[8] * proj[0] + modl[9] * proj[4] + modl[10] * proj[8] + modl[11] * proj[12];
-//clip[9] = modl[8] * proj[1] + modl[9] * proj[5] + modl[10] * proj[9] + modl[11] * proj[13];
-//clip[10] = modl[8] * proj[2] + modl[9] * proj[6] + modl[10] * proj[10] + modl[11] * proj[14];
-//clip[11] = modl[8] * proj[3] + modl[9] * proj[7] + modl[10] * proj[11] + modl[11] * proj[15];
+//		m = (b->mx * p->a) + (b->my * p->b) + (b->mz * p->c) + p->d;
+//		n = (b->dx * fabs(p->a)) + (b->dy * fabs(p->b)) + (b->dz * fabs(p->c));
 //
-//clip[12] = modl[12] * proj[0] + modl[13] * proj[4] + modl[14] * proj[8] + modl[15] * proj[12];
-//clip[13] = modl[12] * proj[1] + modl[13] * proj[5] + modl[14] * proj[9] + modl[15] * proj[13];
-//clip[14] = modl[12] * proj[2] + modl[13] * proj[6] + modl[14] * proj[10] + modl[15] * proj[14];
-//clip[15] = modl[12] * proj[3] + modl[13] * proj[7] + modl[14] * proj[11] + modl[15] * proj[15];
+//		if (m + n < 0) return OUTSIDE;
+//		if (m - n < 0) result = INTERSECT;
+//
+//	} return result;
+//}
 
-//// This will extract the RIGHT side of the frustum
-//m_Frustum[RIGHT][A] = clip[3] - clip[0];
-//m_Frustum[RIGHT][B] = clip[7] - clip[4];
-//m_Frustum[RIGHT][C] = clip[11] - clip[8];
-//m_Frustum[RIGHT][D] = clip[15] - clip[12];
-//
-//// Now that we have a normal (A,B,C) and a distance (D) to the plane,
-//// we want to normalize that normal and distance.
-//
-//// Normalize the RIGHT side
-//NormalizePlane(m_Frustum, RIGHT);
-//
-//// This will extract the LEFT side of the frustum
-//m_Frustum[LEFT][A] = clip[3] + clip[0];
-//m_Frustum[LEFT][B] = clip[7] + clip[4];
-//m_Frustum[LEFT][C] = clip[11] + clip[8];
-//m_Frustum[LEFT][D] = clip[15] + clip[12];
+// f(n) = f(n/2) + 1 I get f(n/2^k) + k
+
+// when n = 2k calim that f(2k) = k + 1 for k > this is true f(2) hold assume as i know lol
+
+// 

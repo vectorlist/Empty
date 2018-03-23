@@ -94,6 +94,33 @@ void DXContext::SetTexture(uint slot, Texture* texture)
 	mContext->PSSetShaderResources(slot, 1, &dst->mTexture);
 }
 
+void DXContext::SetDepthStencilEx(DepthStencilState* depthState)
+{
+	//TODO : pre Builted State
+	switch (depthState->Enabled)
+	{
+	case true:
+		mContext->OMSetDepthStencilState(state.depthStencilEnable, 1);
+		break;
+	case false:
+		mContext->OMSetDepthStencilState(state.depthStencilDisable, 1);
+		break;
+	default:
+		break;
+	}
+	switch (depthState->Mask)
+	{
+	case DepthMask::NONE:
+		mContext->OMSetDepthStencilState(preState.depthStencilMaskedNone, 1);
+		break;
+	case DepthMask::ALL:
+		mContext->OMSetDepthStencilState(preState.depthStencilMaskedAll, 1);
+		break;
+	default:
+		break;
+	}
+}
+
 void DXContext::SetMainRenderTargetView()
 {
 	//prepare render target and depth stencil
@@ -306,5 +333,24 @@ void DXContext::CreateStates()
 
 	LOG_HR << mDevice->CreateSamplerState(&samplerInfo, &state.samplerClampState);
 
-	/*------------------------ TODO : addtional states----------------------------*/
+	//==================== Pre Built States ===========================
+
+
+	this->CreatePreBuiltStates();
+}
+
+void DXContext::CreatePreBuiltStates()
+{
+	D3D11_DEPTH_STENCIL_DESC depthStencilInfo{};
+	depthStencilInfo.DepthEnable = true;
+	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;													
+	depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &preState.depthStencilMaskedAll);
+
+	depthStencilInfo.DepthEnable = true;
+	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+
+	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &preState.depthStencilMaskedNone);
 }

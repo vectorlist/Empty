@@ -23,6 +23,7 @@ class Terrain;
 class Buffer;
 class UniformBuffer;
 class VertexBuffer;
+class IndexBuffer;
 
 //============ BATCH / RENDERER ===================
 class DebugBatch;
@@ -52,7 +53,13 @@ struct ID3D11DeviceContext;
 struct ID3D11ShaderResourceView;
 struct ID3D11Buffer;
 struct ID3D11InputLayout;
+struct ID3D11SamplerState;
 
 //============== IMAGE ============================
-class Image;
-class Mipmap;
+class	Image;
+class	Mipmap;
+struct	PixelBuffer;
+
+//============ ETC ================================
+class Frustum;
+class Environment;

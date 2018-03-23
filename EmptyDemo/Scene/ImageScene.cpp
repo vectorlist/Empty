@@ -16,6 +16,7 @@
 #include <Cache/TerrainCache.h>
 #include <Cache/ModelCache.h>
 
+#include <Graphics/Context.h>
 
 ImageScene::ImageScene()
 {
@@ -24,11 +25,13 @@ ImageScene::ImageScene()
 void ImageScene::InitScene()
 {
 	Viewport v;
-	G_Context->GetViewport(v);
+	GContext->GetViewport(v);
 
-	mCamera = new Camera(45.f, (float)v.w / (float)v.h);
+	mCamera = CreateSceneCamera("Main Camera", 45.f, (float)v.w / (float)v.h,0.1f, 1000.f);
+	mCamera2 = CreateSceneCamera("Sub Camera",60.f, (float)v.w / (float)v.h);
+	currentCamera = mCamera;
 
-	mModel = ModelCache::LoadModel("../data/model/plane.obj");
+	mModel = ModelCache::LoadModel("../data/model/knot.obj");
 
 	BufferCreateInfo info{};
 	info.pData = nullptr;
@@ -44,43 +47,61 @@ void ImageScene::InitScene()
 	mImageTexture = TextureCache::LoadTextureImage("../data/texture/ground.jpg");
 
 	TerrainCreateInfo terrainInfo{};
-	terrainInfo.fileName = "../data/texture/128.bmp";
-	terrainInfo.heightScale = 10;
-	terrainInfo.cellScale = 1;
+	terrainInfo.Filename = "../data/texture/256.bmp";
+	terrainInfo.HeightScale = 100;
+	terrainInfo.CellScale = 1;
 	terrainInfo.nTiles = 1;
 	terrainInfo.nSmooth = 2;
 
 	mTerrain = TerrainCache::CreateTerrain("main terrain", &terrainInfo);
-
-
-
+	//mTerrain->mCamera = mCamera;
 }
 
 void ImageScene::UpdateScene(float delta)
 {
-	mCamera->ProcessFirstPerson(GInput, delta);
+	if(GInput->IsKeyPressed('1')) {
+		currentCamera = mCamera;
+	}
+	if (GInput->IsKeyPressed('2')) {
+		currentCamera = mCamera2;
+	}
+	currentCamera->ProcessFirstPerson(GInput, delta);
 
-	matrice.proj = mCamera->GetProjection();
-	matrice.view = mCamera->GetView();
+	matrice.proj = currentCamera->GetProjection();
+	matrice.view = currentCamera->GetView();
 	matrice.model = Matrix4x4();
 	mUbo->Update(&matrice);
 }
 
+#include <Physics/Tree/QuadTree.h>
+
 void ImageScene::RenderScene()
 {
-	//mShader->Bind();
 	mUbo->BindVS(0);
-	//TODO Texture seperate vs, ps
-	//mTexture->Bind(0);
-	//mImageTexture->Bind(0);
-
-	//mModel->Render();
 
 
-	mTerrain->TestRender();
+	//in bound
+	Frustum frustum;
+	frustum.Extract(mCamera->GetProjection(), mCamera->GetView());
 
-	AABB aabb(mTerrain->mMin, mTerrain->mMax);
-	G_DebugBatch->RenderAABB(&aabb, Matrix4x4(), vec3f(1));
+	mShader->Bind();
+	mTexture->Bind(0);
+
+	mTerrain->Render(&frustum);
+	//mTerrain->Render(nullptr);
+
+	//for (int i = 0; i < mTerrain->mTree.mVisibleQueryNodesCount; ++i)
+	//{
+	//	auto aabb = &mTerrain->mTree.mQN[i]->mAABB;
+	//	G_DebugBatch->RenderAABB(aabb, Matrix4x4(), vec3f(1, 0, 0));
+	//}
+
+	//auto qt = mTerrain->mQuadTree.mChild[0];
+	//auto* qt = &mTerrain->mQuadTree;
+
+	//auto* aabb = &qt->mAABB;
+
+	//G_DebugBatch->RenderAABB(aabb, Matrix4x4(), vec3f(1));
 }
 
 void ImageScene::RenderText()
@@ -89,4 +110,8 @@ void ImageScene::RenderText()
 	vec3f pos = mCamera->GetPostion();
 	sprintf(buffer, "pos : %.3f %.3f %.3f", pos.x, pos.y, pos.z);
 	G_FontBatch->Render(10, 10, buffer, vec4f(1));
+
+	uint nodes = mTerrain->mTree.mVisibleQueryNodesCount;
+	sprintf(buffer, "Query Visvle Vertices : %d Query Nodes : %d", mTerrain->result.renderedVertices, nodes);
+	G_FontBatch->Render(10, 70, buffer, vec4f(1));
 }

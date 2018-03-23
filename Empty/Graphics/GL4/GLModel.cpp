@@ -78,27 +78,27 @@ void GLModel::CreateBuffer(ModelCreateInfo& info)
 	glBindVertexArray(vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, info.verticesSize, info.pVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, info.VerticesSize, info.pVertices, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.indicesSize, info.pIndices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.IndicesSize, info.pIndices, GL_STATIC_DRAW);
 
-	for (int i = 0; i < info.inputAttibSize; ++i)
+	for (int i = 0; i < info.AttribSize; ++i)
 	{
 		glEnableVertexAttribArray(i);
-		VertexInputAttib attb = info.pInputAttrib[i];
+		VertexAttrib attb = info.pAttrib[i];
 		glVertexAttribPointer(i,
-			attb.formatSize,
-			GLTransform::GetVertextFormat(attb.format),
+			attb.FormatSize,
+			GLTransform::GetVertextFormat(attb.Format),
 			GL_FALSE,
-			attb.stride,
-			(void*)attb.offset);
+			attb.Stride,
+			(void*)attb.Offset);
 	}
 
 	//close VAO
 	glBindVertexArray(0);
 
-	mIndiceNum = info.indicesSize;
+	mIndiceNum = info.IndicesSize;
 	mHasBuffer = true;
 	//TODO bool possible mesh
 	//mMesh.SetIndexedVertices(vertice.data(), indices.data(), indices.size());

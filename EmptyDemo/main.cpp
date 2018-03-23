@@ -7,11 +7,7 @@
 
 #include <Scene/FontBatchScene.h>
 #include <Scene/ImageScene.h>
-
-#define TEST_ASSERT(x, ...) \
-do{							\
-}while(false)
-
+#include <Scene/SkyScene.h>
 
 int main(int args, char* argv[])
 {
@@ -22,13 +18,14 @@ int main(int args, char* argv[])
 	info->apiType = GraphicAPI::OPENGL45;
 	//info->apiType = GraphicAPI::DIRECTX11;
 	info->flags = APP_CENTERPOS | APP_TITLEBAR;
-	info->vsync = false;
+	info->vsync = true;
 
 	Application app;
 	
-	G_SceneCache->AddScene<FontBatchScene>("font");
-	G_SceneCache->AddScene<ImageScene>("image");
-	G_SceneCache->SetQueueScene("image");
+	G_SceneCache->AddScene<SkyScene>("SkyDome");
+	G_SceneCache->AddScene<FontBatchScene>("Font");
+	G_SceneCache->AddScene<ImageScene>("Image");
+	G_SceneCache->SetQueueScene("SkyDome");
 
 
 	return app.Run();

@@ -147,6 +147,7 @@ struct BufferCreateInfo
 	BufferBinding	binding;
 };
 
+//TODO REMOVE
 enum class InputType : uint
 {
 	BYTE = 0xFF,
@@ -157,6 +158,7 @@ enum class InputType : uint
 	DOUBLE
 };
 
+//TODO REMOVE
 struct InputLayout
 {
 	uint slot;
@@ -166,14 +168,15 @@ struct InputLayout
 	uint offset;
 };
 
-enum class Topolgy : Enum
+enum class Topology : Enum
 {
 	POINT = 0xF0F0,
 	LINE,
 	LINE_STRIP,
 	TRIANGLE,
 	TRIANGLE_STRIP,
-	QUAD
+	QUAD,
+	UNKWON
 };
 
 enum class VertexFormat : Enum
@@ -187,24 +190,43 @@ enum class VertexFormat : Enum
 };
 
 //TODO : slot index
-struct VertexInputAttib
+typedef struct VertexAttrib
 {
-	uint			location;
-	VertexFormat	format;
-	uint			formatSize;
-	uint			stride;
-	uint			offset;
+	uint			Location;
+	VertexFormat	Format;
+	uint			FormatSize;
+	uint			Stride;
+	uint			Offset;
+}VertexInputAttrib;
+//=================== Vertex Buffer ===================
+
+struct VertexBufferCreateInfo
+{
+	BufferType			Type;
+	void*				pVertices;
+	uint				VerticesSize;
+	VertexAttrib*		pAttrib;
+	uint				AttribSize;
 };
+
+//================== Index Buffer =====================
+
+struct IndexBufferCreateInfo
+{
+	void*				pIndices;
+	uint				IndicesSize;
+};
+
 //====================== Model ========================
 
 struct ModelCreateInfo
 {
 	void*				pVertices;
-	uint				verticesSize;
+	uint				VerticesSize;
 	void*				pIndices;
-	uint				indicesSize;
-	VertexInputAttib*	pInputAttrib;
-	uint				inputAttibSize;
+	uint				IndicesSize;
+	VertexAttrib*		pAttrib;
+	uint				AttribSize;
 };
 
 //==================== Node ===========================
@@ -214,3 +236,67 @@ typedef struct TerrainNodeVertex
 	vec3f pos;
 	vec3f normal;
 }NodeVertex;
+
+//=================== TERRAIN =========================
+struct TerrainCreateInfo
+{
+	const char* Filename;
+	float		CellScale;
+	float		HeightScale;
+	uint		nTiles;
+	uint		nSmooth;
+};
+
+struct TerrainVertex
+{
+	vec3f pos;
+	vec3f normal;
+	vec2f st;
+	vec2f uv;
+	vec3f binormal;
+	vec3f tangent;
+};
+
+struct TriangleIndex
+{
+	uint p0;
+	uint p1;
+	uint p2;
+};
+
+//================ RASTER STATE ====================
+
+
+//================ DEPTH STATE =====================
+
+enum class DepthMask : uint 
+{ 
+	NONE = 0x00,
+	ALL = 0xFF
+};
+enum class DepthFunc : uint
+{
+	LESS = 0U,
+	EQUAL,
+	LESS_EQUAL,
+	GREATER,
+	NOT_EQUAL,
+	GREATER_EQUAL,
+	ALWAYS
+};
+
+struct DepthStencilState
+{
+	DepthMask	Mask;			//Stencil Mask
+	bool		Enabled;		//enable stencil
+	DepthFunc   Func;			//Comparison fun
+};
+
+//============== SAMPLER STATE ===================
+
+
+
+struct SamplerCreateInfo
+{
+
+};

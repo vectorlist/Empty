@@ -38,7 +38,7 @@ void GLFontBatch::Init(const char* filename, int size)
 	mUbo = BufferCache::CreateUniformBuffer(info);
 
 	Viewport vp;
-	G_Context->GetViewport(vp);
+	GContext->GetViewport(vp);
 
 	Matrix4x4 screen = Matrix4x4::NDCToScreenZeroToOne(vp.w, vp.h);
 
@@ -76,7 +76,7 @@ void GLFontBatch::Render(int x, int y, const char* text, const vec4f& color)
 		auto& font = fonts[*c];
 
 		float posx = (x + font.bl);
-		float posy = (y - (font.h + font.bt)) + mHeight;
+		float posy = (y - (font.h - font.bt)) + mHeight;
 
 		float w = font.w;
 		float h = font.h;
@@ -114,12 +114,12 @@ void GLFontBatch::EndBatch()
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(FontInstanceVertex) * instanceCounts,
 		mVertices.get());
 
-	G_Context->SetBlendState(true);
+	GContext->SetBlendState(true);
 	//draw 6 index at once 0 1 2 2 1 3 6times
 	glBindVertexArray(mVao);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceCounts);
 	glBindVertexArray(0);
-	G_Context->SetBlendState(false);
+	GContext->SetBlendState(false);
 	mShader->UnBind();
 
 	//render Instance
@@ -200,13 +200,13 @@ void GLFontBatch::CreateFontAndTexture(const char * filename, int size)
 		fonts[c].h = (float)glyph->bitmap.rows;
 
 		fonts[c].bl = (float)glyph->bitmap_left;
-		fonts[c].bt = (float)((glyph->metrics.horiBearingY - glyph->metrics.height) >> 6);
-		//fonts[c].bt = (float)((glyph->metrics.height - glyph->metrics.horiBearingY) >> 6);
+		//fonts[c].bt = (float)((glyph->metrics.horiBearingY - glyph->metrics.height) >> 6);
+		fonts[c].bt = (float)((glyph->metrics.height - glyph->metrics.horiBearingY) >> 6);
 
 		fonts[c].uvx1 = (float)offsetx / (float)mWidth;
-		fonts[c].uvx2 = (float)(offsetx + glyph->bitmap.width) / (float)mWidth;
-
 		fonts[c].uvy1 = (float)offsety / (float)mHeight;
+
+		fonts[c].uvx2 = (float)(offsetx + glyph->bitmap.width) / (float)mWidth;
 		fonts[c].uvy2 = (float)(offsety + glyph->bitmap.rows) / (float)mHeight;
 
 		rowHeight = std::max(rowHeight, glyph->bitmap.rows);
