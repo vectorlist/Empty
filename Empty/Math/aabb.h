@@ -19,6 +19,7 @@ struct AABB : public BSpehre
 	enum Axis { X = 0U, Y = 1U, Z = 2U};
 	AABB() : min(FLT_MAX), max(-FLT_MAX) {}
 	AABB(const vec3f& min, const vec3f& max);
+	AABB(const AABB& aabb);
 
 	void    Init(const vec3f& min, const vec3f& max);
 	void	Expand(const AABB& aabb);

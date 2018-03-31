@@ -10,14 +10,15 @@ public:
 	~SceneCache();
 
 	template <typename T>
-	Scene*	AddScene(const std::string& name);
-	void	SetQueueScene(const std::string& name);
+	static Scene*	AddScene(const std::string& name);
+	static void		SetQueueScene(const std::string& name);
 
 	void Update(float delta);
 	void Render();
 	void ReleaseAll();
 
-	std::map<std::string, std::shared_ptr<Scene>> mScenes;
+private:
+	static std::map<std::string, std::shared_ptr<Scene>> mScenes;
 
 	static Scene* currentScene;
 	static Scene* queuedScene;

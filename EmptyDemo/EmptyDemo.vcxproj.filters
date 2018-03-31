@@ -13,24 +13,18 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\FontBatchScene.cpp">
+    <ClCompile Include="Scene\CullScene.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Scene\ImageScene.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene\SkyScene.cpp">
+    <ClCompile Include="Scene\DeferredScene.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Scene\FontBatchScene.h">
+    <ClInclude Include="Scene\CullScene.h">
       <Filter>Source Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Scene\ImageScene.h">
-      <Filter>Source Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene\SkyScene.h">
+    <ClInclude Include="Scene\DeferredScene.h">
       <Filter>Source Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>

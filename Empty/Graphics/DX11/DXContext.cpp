@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include "DXContext.h"
 #include <window/applicationinfo.h>
 
@@ -26,6 +26,8 @@ void DXContext::Clear(float r, float g, float b, float a)
 	float rgba[4] = { r,g,b,a };
 	mContext->ClearRenderTargetView(mRenderTargetView, rgba);
 	mContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	this->SetMainRenderTargetView();
 }
 
 
@@ -76,7 +78,7 @@ void DXContext::SetWireFrameState(bool enable)
 	if (enable)
 		mContext->RSSetState(state.rasterWireFrameState);
 	else
-		mContext->RSSetState(state.rasterSolidState);
+		mContext->RSSetState(state.rasterSolidCullBack);
 }
 
 void DXContext::SetDepthStencil(bool enable)
@@ -96,27 +98,38 @@ void DXContext::SetTexture(uint slot, Texture* texture)
 
 void DXContext::SetDepthStencilEx(DepthStencilState* depthState)
 {
-	//TODO : pre Builted State
-	switch (depthState->Enabled)
-	{
-	case true:
-		mContext->OMSetDepthStencilState(state.depthStencilEnable, 1);
-		break;
-	case false:
-		mContext->OMSetDepthStencilState(state.depthStencilDisable, 1);
-		break;
-	default:
-		break;
+	if (depthState->Enabled) {
+		switch (depthState->Func)
+		{
+		case DepthFunc::LESS:
+			mContext->OMSetDepthStencilState(depthStates.EnableMaskedAllCompLess, 1);
+			break;
+		case DepthFunc::LESS_EQUAL:
+			mContext->OMSetDepthStencilState(depthStates.EnableMaskedAllCompLessEqual, 1);
+			break;
+		default:
+			break;
+		}
 	}
-	switch (depthState->Mask)
+	else {
+		mContext->OMSetDepthStencilState(depthStates.DisableMaskedNoneCompNever, 1);
+	}
+}
+
+void DXContext::SetCullMode(CullMode mode)
+{
+	switch (mode)
 	{
-	case DepthMask::NONE:
-		mContext->OMSetDepthStencilState(preState.depthStencilMaskedNone, 1);
+	case CullMode::FRONT:
+		mContext->RSSetState(state.rasterSolidCullFront);
 		break;
-	case DepthMask::ALL:
-		mContext->OMSetDepthStencilState(preState.depthStencilMaskedAll, 1);
+	case CullMode::BACK:
+		mContext->RSSetState(state.rasterSolidCullBack);
 		break;
-	default:
+	case CullMode::FRONT_AND_BACK:
+		mContext->RSSetState(state.rasterSolidCullNone);
+	case CullMode::NONE:
+		mContext->RSSetState(state.rasterSolidCullNone);
 		break;
 	}
 }
@@ -220,7 +233,7 @@ void DXContext::CreateStates()
 	depthStencilInfo.StencilEnable = true;
 	depthStencilInfo.StencilWriteMask = 0xFF;
 	depthStencilInfo.StencilReadMask = 0xFF;
-
+	
 	//front face
 	depthStencilInfo.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilInfo.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
@@ -256,14 +269,9 @@ void DXContext::CreateStates()
 	//Raster state
 	D3D11_RASTERIZER_DESC rasterInfo{};
 
-
 	rasterInfo.AntialiasedLineEnable = false;
-	rasterInfo.CullMode = D3D11_CULL_BACK;			//dont cull for now(test)
-													//ClockWise Order = false (DX defualt)
-													//CounterClockWise Order = true (same as OpenGL)
-	rasterInfo.FrontCounterClockwise = false;		//we using CW with opengl
-	//rasterInfo.CullMode = D3D11_CULL_NONE;
-
+	rasterInfo.CullMode = D3D11_CULL_BACK;			
+	rasterInfo.FrontCounterClockwise = false;		
 	rasterInfo.DepthBias = 0;
 	rasterInfo.DepthBiasClamp = 0.0f;
 	rasterInfo.DepthClipEnable = true;
@@ -272,15 +280,23 @@ void DXContext::CreateStates()
 	rasterInfo.ScissorEnable = false;
 	rasterInfo.SlopeScaledDepthBias = 0.0f;
 
-	//LOG_HR << mDevice->CreateRasterizerState(&rasterInfo, &mRasterState);
-	LOG_HR << mDevice->CreateRasterizerState(&rasterInfo, &state.rasterSolidState);
+	LOG_HR << mDevice->CreateRasterizerState(&rasterInfo, &state.rasterSolidCullBack);
 
+	rasterInfo.CullMode = D3D11_CULL_NONE;			
+
+	LOG_HR << mDevice->CreateRasterizerState(&rasterInfo, &state.rasterSolidCullNone);
+
+	rasterInfo.CullMode = D3D11_CULL_FRONT;
+
+	LOG_HR << mDevice->CreateRasterizerState(&rasterInfo, &state.rasterSolidCullFront);
+
+	rasterInfo.CullMode = D3D11_CULL_BACK;			
 	rasterInfo.FillMode = D3D11_FILL_WIREFRAME;
 
 	LOG_HR << mDevice->CreateRasterizerState(&rasterInfo, &state.rasterWireFrameState);
 
 	//set raster default as solid
-	mContext->RSSetState(state.rasterSolidState);
+	mContext->RSSetState(state.rasterSolidCullBack);
 
 	/*------------------------------ view port --------------------------------*/
 	mViewPort.Width = (float)info->width;
@@ -305,7 +321,6 @@ void DXContext::CreateStates()
 	blendInfo.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 	blendInfo.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
-	//LOG_HR << mDevice->CreateBlendState(&blendInfo, &mBlendState);
 	LOG_HR << mDevice->CreateBlendState(&blendInfo, &state.blendenable);
 
 	blendInfo.RenderTarget[0].BlendEnable = false;
@@ -333,6 +348,8 @@ void DXContext::CreateStates()
 
 	LOG_HR << mDevice->CreateSamplerState(&samplerInfo, &state.samplerClampState);
 
+	//Set Default Sampler(Warp)
+	mContext->PSSetSamplers(0, 1, &state.samplerWarpState);
 	//==================== Pre Built States ===========================
 
 
@@ -343,14 +360,43 @@ void DXContext::CreatePreBuiltStates()
 {
 	D3D11_DEPTH_STENCIL_DESC depthStencilInfo{};
 	depthStencilInfo.DepthEnable = true;
-	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;													
-	depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS;
 
-	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &preState.depthStencilMaskedAll);
+	depthStencilInfo.StencilEnable = true;
+	depthStencilInfo.StencilWriteMask = 0xFF;
+	depthStencilInfo.StencilReadMask = 0xFF;
+
+	depthStencilInfo.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilInfo.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilInfo.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilInfo.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	depthStencilInfo.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilInfo.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;	
+	depthStencilInfo.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilInfo.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &depthStates.EnableMaskedAllCompLess);
 
 	depthStencilInfo.DepthEnable = true;
-	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
-	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &preState.depthStencilMaskedNone);
+	depthStencilInfo.StencilEnable = true;
+	depthStencilInfo.StencilWriteMask = 0xFF;
+	depthStencilInfo.StencilReadMask = 0xFF;
+
+	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &depthStates.EnableMaskedAllCompLessEqual);
+
+	depthStencilInfo.DepthEnable = false;
+	depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	depthStencilInfo.DepthFunc = D3D11_COMPARISON_NEVER;
+
+	depthStencilInfo.StencilEnable = false;
+	depthStencilInfo.StencilWriteMask = 0xFF;
+	depthStencilInfo.StencilReadMask = 0xFF;
+
+	LOG_HR << mDevice->CreateDepthStencilState(&depthStencilInfo, &depthStates.DisableMaskedNoneCompNever);
+
+
 }

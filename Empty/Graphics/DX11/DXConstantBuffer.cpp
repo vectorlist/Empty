@@ -1,14 +1,11 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <graphics/dx11/dxconstantbuffer.h>
 
 DXConstantBuffer::DXConstantBuffer()
 	: mBuffer(nullptr), mDevice(nullptr), mContext(nullptr)
 {
 	mDevice = G_DXDevice;
-	//not sure immediatecontext and global context
 	mDevice->GetImmediateContext(&mContext);
-	//mContext = G_DXContext;
-
 }
 
 DXConstantBuffer::~DXConstantBuffer()
@@ -16,12 +13,12 @@ DXConstantBuffer::~DXConstantBuffer()
 	SAFE_RELEASE(mBuffer);
 }
 
-void DXConstantBuffer::Init(BufferCreateInfo& info)
+void DXConstantBuffer::Init(BufferCreateInfo* info)
 {
 	//just default for now
 	D3D11_BUFFER_DESC bufferInfo{};
 	bufferInfo.Usage = D3D11_USAGE_DEFAULT;
-	bufferInfo.ByteWidth = info.size;
+	bufferInfo.ByteWidth = info->size;
 	bufferInfo.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bufferInfo.CPUAccessFlags = 0;
 

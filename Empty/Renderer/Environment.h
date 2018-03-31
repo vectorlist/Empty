@@ -33,10 +33,10 @@ class SkyCube : public Environment
 {
 public:
 	SkyCube();
+	virtual~SkyCube();
 
 	void Init();
 	bool InitFromImages(const std::vector<std::string>& images);
-
 
 	void Render();
 
@@ -47,10 +47,6 @@ public:
 	std::array<VertexBuffer*, 6>	mVerticesBuffers;
 	IndexBuffer*					mIndexBuffer;
 	
-	
-
-	
-
 	ID3D11DepthStencilState* mDepthStencilState = nullptr;
 	ID3D11SamplerState* mSamplerState = nullptr;
 };

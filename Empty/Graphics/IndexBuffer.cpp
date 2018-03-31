@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Graphics/IndexBuffer.h>
 
 #include <Graphics/TypeTransform.h>
@@ -35,11 +35,14 @@ void GLIndexBuffer::UnBind()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 }
 
-void GLIndexBuffer::RenderIndexed(Topology topolgy, uint indexedCount)
+void GLIndexBuffer::DrawIndexed(Topology topolgy, uint indexedCount)
 {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mIbo);
 	glDrawElements(GLTransform::GetTopology(topolgy), indexedCount, GL_UNSIGNED_INT, NULL);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
+}
+
+void GLIndexBuffer::DrawIndexedBaseVertex(Topology topology, uint count, void* indices, uint baseVertex)
+{
+	glDrawElementsBaseVertex(GLTransform::GetTopology(topology), count, GL_UNSIGNED_INT, indices, baseVertex);
 }
 
 
@@ -80,9 +83,14 @@ void DXIndexBuffer::UnBind()
 	//Do Nothing
 }
 
-void DXIndexBuffer::RenderIndexed(Topology topolgy, uint indexedCount)
+void DXIndexBuffer::DrawIndexed(Topology topolgy, uint indexedCount)
 {
-	G_DXContext->IASetIndexBuffer(mIbo, DXGI_FORMAT_R32_UINT, 0);
 	G_DXContext->IASetPrimitiveTopology(DXTransform::GetTopology(topolgy));
 	G_DXContext->DrawIndexed(indexedCount, 0, 0);
+}
+
+void DXIndexBuffer::DrawIndexedBaseVertex(Topology topology, uint count, void * indices, uint baseVertex)
+{
+	G_DXContext->IASetPrimitiveTopology(DXTransform::GetTopology(topology));
+	G_DXContext->DrawIndexed(count, 0, baseVertex);
 }

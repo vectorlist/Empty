@@ -8,5 +8,5 @@ class Sampler
 public:
 	Sampler() = default;
 
-	Sampler()
+	Sampler() {}
 };

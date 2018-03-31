@@ -1,7 +1,10 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include "DXModel.h"
 #include <Graphics/DX11/DXContext.h>
 #include <Graphics/TypeTransform.h>
+#include <Graphics/Texture.h>
+
+ID3D11Buffer* DXModel::gInstanceBuffer = nullptr;
 
 DXModel::DXModel()
 	: mVertexBuffer(nullptr), mIndexBuffer(nullptr), mInputLayout(nullptr)
@@ -11,11 +14,11 @@ DXModel::DXModel()
 
 DXModel::~DXModel()
 {
+	SAFE_RELEASE(mInputLayout);
 	SAFE_RELEASE(mVertexBuffer);
 	SAFE_RELEASE(mIndexBuffer);
 }
 
-/*Create Buffer Without Input Layout and Specific Vertex Type*/
 void DXModel::CreateBuffer(std::vector<Vertex>& vertice, std::vector<uint>& indice)
 {
 	D3D11_BUFFER_DESC vtxInfo{};
@@ -23,18 +26,21 @@ void DXModel::CreateBuffer(std::vector<Vertex>& vertice, std::vector<uint>& indi
 	vtxInfo.ByteWidth = sizeof(Vertex) * vertice.size();
 	vtxInfo.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vtxInfo.CPUAccessFlags = 0;
+	vtxInfo.MiscFlags = 0;
+	vtxInfo.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA vtxData{};
 	vtxData.pSysMem = vertice.data();
 
 	LOG_HR << G_DXDevice->CreateBuffer(&vtxInfo, &vtxData, &mVertexBuffer);
 
-	//indices
 	D3D11_BUFFER_DESC indexInfo{};
 	indexInfo.Usage = D3D11_USAGE_DEFAULT;
 	indexInfo.ByteWidth = sizeof(uint) * indice.size();
 	indexInfo.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	indexInfo.CPUAccessFlags = 0;
+	indexInfo.MiscFlags = 0;
+	indexInfo.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA indexData{};
 	indexData.pSysMem = indice.data();
@@ -43,120 +49,133 @@ void DXModel::CreateBuffer(std::vector<Vertex>& vertice, std::vector<uint>& indi
 
 	mIndiceNum = (uint)indice.size();
 	mHasBuffer = true;
-	mStride = sizeof(Vertex);
-	mMesh.SetIndexedVertices(vertice.data(), indice.data(), indice.size());
-}
 
-/*Create Buffer With Input Layout*/
-void DXModel::CreateBuffer(ModelCreateInfo& info)
-{
-	D3D11_BUFFER_DESC vtxInfo{};
-	vtxInfo.Usage = D3D11_USAGE_DEFAULT;
-	vtxInfo.ByteWidth = info.VerticesSize;
-	vtxInfo.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vtxInfo.CPUAccessFlags = 0;
+	//Layout
+	std::vector<D3D11_INPUT_ELEMENT_DESC> inputs = {
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 2, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 3, DXGI_FORMAT_R32G32B32_FLOAT, 0, 44, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//INSTANCING MATRIX
+		{ "INSTANCE", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INSTANCE", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INSTANCE", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		{ "INSTANCE", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		//TODO : INSTANCING
+	};
 
-	D3D11_SUBRESOURCE_DATA vtxData{};
-	vtxData.pSysMem = info.pVertices;
+	//start per instance from TEXCOORD4 must be offset reset as 0
 
-	LOG_HR << G_DXDevice->CreateBuffer(&vtxInfo, &vtxData, &mVertexBuffer);
+	//Dummy Code for proxy layout input
+	std::string dummyCode = R"(
+struct VS_In {
+float3 pos : POSITION;
+float3 param0 : TEXCOORD0;
+float2 param1 : TEXCOORD1;
+float3 param2 : TEXCOORD2;
+float3 param3 : TEXCOORD3;
+//Matrix instance
+float4 ins0 : INSTANCE0;
+float4 ins1 : INSTANCE1;
+float4 ins2 : INSTANCE2;
+float4 ins3 : INSTANCE3;
+};
+float4 VS(VS_In vs) : SV_POSITION { return vs.pos.xxxx;};
+)";
+	ID3DBlob* eb = nullptr; //error blob
+	ID3DBlob* vb = nullptr; //code blob
 
-	//indices
-	D3D11_BUFFER_DESC indexInfo{};
-	indexInfo.Usage = D3D11_USAGE_DEFAULT;
-	indexInfo.ByteWidth = info.IndicesSize;
-	indexInfo.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexInfo.CPUAccessFlags = 0;
+	//Compile
+	LOG_HR << D3DCompile(dummyCode.c_str(), dummyCode.size(), nullptr, nullptr, nullptr,
+		"VS", "vs_5_0", 0, 0, &vb, &eb);
 
-	D3D11_SUBRESOURCE_DATA indexData{};
-	indexData.pSysMem = info.pIndices;
-
-	LOG_HR << G_DXDevice->CreateBuffer(&indexInfo, &indexData, &mIndexBuffer);
-
-	mIndiceNum = info.IndicesSize;
-	mHasBuffer = true;
-	mStride = info.pAttrib[0].Stride;
-	//Create Dummy InputLayout
-	this->CreateInputLayout(info);
-}
-
-void DXModel::CreateInputLayout(ModelCreateInfo& info)
-{
-	//Dummy Vertex code for InputLayout
-	std::string dummyCode;
-
-	//match to inputlayout
-	std::vector<D3D11_INPUT_ELEMENT_DESC> inputElements(info.AttribSize);
-
-	dummyCode += "struct VS_In {";
-
-	for (uint i = 0; i < info.AttribSize; ++i)
-	{
-		D3D11_INPUT_ELEMENT_DESC& element = inputElements[i];
-		VertexAttrib& attr = info.pAttrib[i];
-		//Match Semantic Name (0 index must be "POSITION", others "TEXCOORD0", "TEXCOORDS1"...etc) 
-		element.SemanticName = (i == 0) ? "POSITION" : "TEXCOORD";
-		element.SemanticIndex = (i == 0) ? 0 : (i - 1);
-		element.Format = DXTransform::GetVertexFormat(attr.Format, attr.FormatSize);
-		element.InputSlot = attr.Location;
-		element.AlignedByteOffset = attr.Offset;
-		element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;		//TODO : INSTANCE
-		element.InstanceDataStepRate = 0;							//TODO : INSTACE PER DRAW
-
-		uint formatSize = attr.FormatSize;
-
-		//TODO : append float size
-		if (i == 0) {
-			dummyCode += "float" + std::to_string(formatSize) + " pos : POSITION; ";
-		}
-		else {
-			dummyCode += "float" + std::to_string(formatSize) +
-				" param" + std::to_string(i - 1) + " : TEXCOORD" + std::to_string(i - 1) + ";";
-		}
+	if (eb != nullptr) {
+		ASSERT_MSG(0, "failed to compile");
 	}
 
-	dummyCode += "}; float4 VS(VS_In vs) : SV_POSITION { return vs.pos.xxxx;};";
-
-	ID3DBlob* errBlob = nullptr;
-	ID3DBlob* vBlob = nullptr;
-	LOG_HR << D3DCompile(dummyCode.c_str(), dummyCode.size(), nullptr, nullptr,
-		nullptr, "VS", "vs_5_0", 0, 0, &vBlob, &errBlob);
-
-	if (errBlob) {
-		LOG << errBlob->GetBufferPointer() << ENDN;
-		errBlob->Release();
-	}
-
-	//Create Layout
 	LOG_HR << G_DXDevice->CreateInputLayout(
-		inputElements.data(),
-		inputElements.size(),
-		vBlob->GetBufferPointer(),
-		vBlob->GetBufferSize(),
+		inputs.data(),
+		inputs.size(),
+		vb->GetBufferPointer(),
+		vb->GetBufferSize(),
 		&mInputLayout);
 
-	//Remove Dummy Shader
-	vBlob->Release();
-}
+	//TODO : INSTACNING BUFFER (expensive per model static?)
+	//Check already created 
+	if (DXModel::gInstanceBuffer == nullptr)
+	{
+		D3D11_BUFFER_DESC instanceInfo{};
+		instanceInfo.Usage = D3D11_USAGE_DYNAMIC;
+		instanceInfo.ByteWidth = sizeof(Vertex) * MAX_INSTANCE_PER_MODEL;
+		instanceInfo.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		instanceInfo.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		instanceInfo.StructureByteStride = 0;
+		instanceInfo.MiscFlags = 0;
+
+		LOG_HR << G_DXDevice->CreateBuffer(&instanceInfo, nullptr, &gInstanceBuffer);
+	}
+
+};
+
 
 
 void DXModel::Bind()
 {
-	if (mInputLayout != nullptr)
-		G_DXContext->IASetInputLayout(mInputLayout);
-	G_DXContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &mStride, &mOffset);
-	G_DXContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-	G_DXContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 }
 
 void DXModel::Render()
 {
-	if (mInputLayout != nullptr)	//InputLayout Created?
-		G_DXContext->IASetInputLayout(mInputLayout);
-	G_DXContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &mStride, &mOffset);
+	uint stride = sizeof(Vertex);
+	uint offset = 0;
+	G_DXContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &stride, &offset);
 	G_DXContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	G_DXContext->IASetInputLayout(mInputLayout);
 	G_DXContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	G_DXContext->DrawIndexed(mIndiceNum, 0, 0);
+
+	for (uint i = 0; i < mNodes.size(); ++i)
+	{
+		if (mNodes[i].texture) {
+			mNodes[i].texture->Bind(0);
+		}
+		G_DXContext->DrawIndexed(mNodes[i].IndicesNum, mNodes[i].IndicesOffset, 0);
+	}
+}
+
+void DXModel::RenderInstnaced(uint instanceNum, const Matrix4x4* data)
+{
+	//Upload data to GPU
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+	G_DXContext->Map(DXModel::gInstanceBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	//copy ranged
+	memcpy(mapped.pData, data, sizeof(Matrix4x4) * instanceNum);
+	//close
+	G_DXContext->Unmap(DXModel::gInstanceBuffer, 0);
+
+	//main buffer : pos normal st......
+	//instance buffer : float4 row0 row1 row2 row3
+	
+	uint strides[2] = { sizeof(Vertex), sizeof(Matrix4x4) };
+	uint offsets[2] = { 0,0 };
+	ID3D11Buffer* buffers[2] = { mVertexBuffer, gInstanceBuffer };//main buffer, instance buffer
+
+	G_DXContext->IASetVertexBuffers(0, 2, buffers, strides, offsets);
+	G_DXContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	G_DXContext->IASetInputLayout(mInputLayout);
+	G_DXContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	for (uint i = 0; i < mNodes.size(); ++i)
+	{
+		//TEXTURE PER NODe
+		if (mNodes[i].texture) {
+			mNodes[i].texture->Bind(0);
+		}
+
+		G_DXContext->DrawIndexedInstanced(mNodes[i].IndicesNum, instanceNum,
+			mNodes[i].IndicesOffset, 0, 0);
+	}
+
 }
 
 

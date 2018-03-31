@@ -1,5 +1,7 @@
 #pragma once
 
+//TODO Inherite Renderable Tree Node
+
 class BVHTreeNode
 {
 public:
@@ -14,11 +16,16 @@ public:
 
 	//total world AABB
 	AABB mAabb;
-	//TODO : template <Object T>
+	AABB* GetAABB() { return  &mAabb; }
+	//Expensive BVH
 	std::vector<Object*> mObjects;
+
 	static BVHTreeNode* Build(std::vector<Object*>& objects, uint level);
 
-	void RenderAllNode();
+	bool DoCulling(Frustum& frustum);
 
 	bool IsLeaf() const { return mLeft == nullptr && mRight == nullptr; }
+
+	//(Hold any of type) (instance object, matrix, properties)
+	void* customPtr = nullptr;
 };

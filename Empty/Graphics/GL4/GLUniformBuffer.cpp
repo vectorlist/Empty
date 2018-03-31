@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Graphics/GL4/GLUniformBuffer.h>
 #include <Graphics/GL4/GLConfig.h>
 
@@ -15,21 +15,21 @@ GLUnifomBuffer::~GLUnifomBuffer()
 	}
 }
 
-void GLUnifomBuffer::Init(BufferCreateInfo& info)
+void GLUnifomBuffer::Init(BufferCreateInfo* info)
 {
-	mSize = info.size;
+	mSize = info->size;
 	glGenBuffers(1, &ubo);
 	glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-	switch (info.type)
+	switch (info->type)
 	{
 	case BufferType::BUFFER_STATIC:
-		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, info->size, info->pData, GL_STATIC_DRAW);
 		break;
 	case BufferType::BUFFER_DYNAMIC:
-		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_STATIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, info->size, info->pData, GL_STATIC_DRAW);
 		break;
 	default:
-		glBufferData(GL_UNIFORM_BUFFER, info.size, info.pData, GL_DYNAMIC_DRAW);
+		glBufferData(GL_UNIFORM_BUFFER, info->size, info->pData, GL_DYNAMIC_DRAW);
 		break;
 	}
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, ubo, 0, mSize);
@@ -59,5 +59,6 @@ void GLUnifomBuffer::BindVS(uint index)
 
 inline void GLUnifomBuffer::BindPS(uint index)
 {
+	//TODO : Seperate VS and PS uniform block
 	glBindBufferBase(GL_UNIFORM_BUFFER, index, ubo);
 }

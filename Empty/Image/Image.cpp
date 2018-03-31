@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Image/Image.h>
 #include <Math/math.h>
 
@@ -59,10 +59,6 @@ void Image::LoadFromFile(const char* filename, uint requestBytePerPixel)
 	mPixelBuffer = { mPixels.get(), mWidth, mHeight, mBytePerPixel };
 
 	STBI_FREE(buffer);
-	LOG << "Image Format : " << GetFormatStr(format) << ENDN;
-	LOG << "Width : " << w << ENDN;
-	LOG << "Height : " << h << ENDN;
-	LOG << "Graphically Mipmap gen count : " << GetGraphicsMipmapPossibilityCount() << ENDN;
 }
 
 PixelFormat Image::GetFormat() const

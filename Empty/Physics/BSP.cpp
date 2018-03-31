@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Physics/BSP.h>
 //#include <Graphics/GL4/GLConfig.h>
 
@@ -101,7 +101,9 @@ uint BSPTreeNode::SumitIndexBufferToGPU()
 //TODO : render per node on terrain level
 void BSPTreeNode::Render()
 {
-	mIndexBuffer->RenderIndexed(Topology::TRIANGLE, mIndicesCount);
+	mIndexBuffer->Bind();
+	mIndexBuffer->DrawIndexed(Topology::TRIANGLES, mIndicesCount);
+	mIndexBuffer->UnBind();
 }
 
 void BSPTreeNode::ResetAABB(NodeVertex* vertices)

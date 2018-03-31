@@ -125,14 +125,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Scene\FontBatchScene.cpp" />
-    <ClCompile Include="Scene\ImageScene.cpp" />
-    <ClCompile Include="Scene\SkyScene.cpp" />
+    <ClCompile Include="Scene\CullScene.cpp" />
+    <ClCompile Include="Scene\DeferredScene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Scene\FontBatchScene.h" />
-    <ClInclude Include="Scene\ImageScene.h" />
-    <ClInclude Include="Scene\SkyScene.h" />
+    <ClInclude Include="Scene\CullScene.h" />
+    <ClInclude Include="Scene\DeferredScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Empty\Empty.vcxproj">

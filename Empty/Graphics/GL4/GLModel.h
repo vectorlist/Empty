@@ -9,12 +9,14 @@ public:
 	virtual~GLModel();
 
 	void CreateBuffer(std::vector<Vertex> &vertice, std::vector<uint> &indice) override;
-	void CreateBuffer(ModelCreateInfo& info) override;
+
 	void Bind() override;
 	void Render() override;
+	void RenderInstnaced(uint instanceNum, const Matrix4x4* data) override;
 
 private:
 	uint vao;
 	uint vbo;
 	uint ibo;
+	uint instancedVbo;
 };

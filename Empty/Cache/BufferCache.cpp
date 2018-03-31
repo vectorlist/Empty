@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Cache/BufferCache.h>
 #include <Graphics/Context.h>
 
@@ -8,13 +8,16 @@
 #include <Graphics/GL4/GLVertexBuffer.h>
 #include <Graphics/DX11/DXVertexBuffer.h>
 
+#include <Graphics/GL4/GLFrameBuffer.h>
+#include <Graphics/DX11/DXFrameBuffer.h>
+
 std::vector<std::shared_ptr<Buffer>> BufferCache::mUniformBuffers;
 std::vector<std::shared_ptr<Buffer>> BufferCache::mVertexBuffers;
 std::vector<std::shared_ptr<Buffer>> BufferCache::mIndexBuffers;
 
-UniformBuffer* BufferCache::CreateUniformBuffer(BufferCreateInfo& info)
+UniformBuffer* BufferCache::CreateUniformBuffer(BufferCreateInfo* info)
 {
-	if (info.binding != BufferBinding::BIND_UNIFORM) {
+	if (info->binding != BufferBinding::BIND_UNIFORM) {
 		ASSERT_MSG(0, "be sure uniform biding type");
 	}
 	std::shared_ptr<UniformBuffer> ubo = nullptr;
@@ -70,4 +73,21 @@ IndexBuffer* BufferCache::CreateIndexBuffer(IndexBufferCreateInfo* info)
 	
 	mIndexBuffers.emplace_back(ibo);
 	return ibo.get();
+}
+
+FrameBuffer* BufferCache::CreateFrameBuffer(FrameBufferCreateInfo* info)
+{
+	FrameBuffer* frameBuffer = nullptr;
+	switch (GContext->GetApiType())
+	{
+	case GraphicAPI::OPENGL45:
+		frameBuffer = new GLFrameBuffer;
+		frameBuffer->Init(info);
+		break;
+	case GraphicAPI::DIRECTX11:
+		frameBuffer = new DXFrameBuffer;
+		frameBuffer->Init(info);
+		break;
+	}
+	return frameBuffer;
 }

@@ -1,13 +1,14 @@
-#include <PCH.h>
+#include <Core/PCH.h>
+
+//#define _PROFILE
 
 #include <window/application.h>
 #include <window/applicationinfo.h>
 
 #include <cache/scenecache.h>
 
-#include <Scene/FontBatchScene.h>
-#include <Scene/ImageScene.h>
-#include <Scene/SkyScene.h>
+#include <Scene/DeferredScene.h>
+#include <Scene/CullScene.h>
 
 int main(int args, char* argv[])
 {
@@ -15,18 +16,16 @@ int main(int args, char* argv[])
 	info->width = 1280;
 	info->height = 720;
 	info->appName = "Empty Engine ";
-	info->apiType = GraphicAPI::OPENGL45;
-	//info->apiType = GraphicAPI::DIRECTX11;
+	//info->apiType = GraphicAPI::OPENGL45;
+	info->apiType = GraphicAPI::DIRECTX11;
 	info->flags = APP_CENTERPOS | APP_TITLEBAR;
-	info->vsync = true;
+	info->vsync = false;
 
 	Application app;
 	
-	G_SceneCache->AddScene<SkyScene>("SkyDome");
-	G_SceneCache->AddScene<FontBatchScene>("Font");
-	G_SceneCache->AddScene<ImageScene>("Image");
-	G_SceneCache->SetQueueScene("SkyDome");
-
+	SceneCache::AddScene<DeferredScene>("deferred");
+	SceneCache::AddScene<CullScene>("cull");
+	SceneCache::SetQueueScene("deferred");
 
 	return app.Run();
 }

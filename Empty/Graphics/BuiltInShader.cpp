@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <graphics/builtinshader.h>
 #include <graphics/context.h>
 
@@ -16,6 +16,10 @@ layout(std140, row_major, binding = 0) uniform UBO
 {
 	mat4 proj;
 	mat4 view;
+};
+
+layout(std140, row_major, binding = 1) uniform UBO0
+{
 	mat4 model;
 };
 
@@ -294,6 +298,10 @@ cbuffer matrice : register(b0)
 {
 	matrix proj;
 	matrix view;
+};
+
+cbuffer matrice0 : register(b1)
+{
 	matrix model;
 };
 

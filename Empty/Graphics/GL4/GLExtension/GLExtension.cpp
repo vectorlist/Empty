@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <graphics/GL4/glextension/glextension.h>
 
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = nullptr;
@@ -18,6 +18,7 @@ PFNGLGENVERTEXARRAYSPROC			glGenVertexArrays = nullptr;
 PFNGLCREATEVERTEXARRAYSPROC			glCreateVertexArrays = nullptr;
 PFNGLVERTEXATTRIBDIVISORPROC		glVertexAttribDivisor = nullptr;
 PFNGLDRAWARRAYSINSTANCEDPROC		glDrawArraysInstanced = nullptr;
+PFNGLDRAWELEMENTSBASEVERTEXPROC     glDrawElementsBaseVertex = nullptr;
 
 PFNGLDELETEBUFFERSPROC				glDeleteBuffers = nullptr;
 PFNGLDELETEVERTEXARRAYSPROC			glDeleteVertexArrays = nullptr;
@@ -46,12 +47,25 @@ PFNGLBINDTEXTUREUNITPROC		glBindTextureUnit		= nullptr;
 PFNGLGENERATEMIPMAPPROC			glGenerateMipmap        = nullptr;
 //PFNGLTEXSUBIMAGE2DEXTPROC		glTexSubImage2D = nullptr;		//overlab instead gl.h
 
+//=================== FRAME BUFFER ======================
+PFNGLGENFRAMEBUFFERSPROC			glGenFramebuffers = nullptr;
+PFNGLBINDFRAMEBUFFERPROC			glBindFramebuffer = nullptr;
+PFNGLFRAMEBUFFERTEXTURE2DPROC	glFramebufferTexture2D = nullptr;
+PFNGLDRAWBUFFERSPROC				glDrawBuffers = nullptr;
+PFNGLGENRENDERBUFFERSPROC		glGenRenderbuffers = nullptr;
+PFNGLBINDRENDERBUFFERPROC		glBindRenderbuffer = nullptr;
+PFNGLRENDERBUFFERSTORAGEPROC		glRenderbufferStorage = nullptr;
+PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer = nullptr;
+PFNGLCHECKFRAMEBUFFERSTATUSPROC	glCheckFramebufferStatus = nullptr;
+PFNGLBLITFRAMEBUFFERPROC			glBlitFramebuffer = nullptr;
 
 //=================== EXT ===============================
-PFNGLNAMEDBUFFERSUBDATAEXTPROC			glNamedBufferSubDataEXT = nullptr;
-PFNGLBINDBUFFERBASEPROC					glBindBufferBase        = nullptr;
-PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2DARB = nullptr;
-PFNGLBINDBUFFERRANGEPROC				glBindBufferRange = nullptr;
+PFNGLNAMEDBUFFERSUBDATAEXTPROC				glNamedBufferSubDataEXT = nullptr;
+PFNGLBINDBUFFERBASEPROC						glBindBufferBase        = nullptr;
+PFNGLCOMPRESSEDTEXIMAGE2DARBPROC			glCompressedTexImage2DARB = nullptr;
+PFNGLBINDBUFFERRANGEPROC					glBindBufferRange = nullptr;
+PFNGLDRAWELEMENTSINSTANCEDPROC				glDrawElementsInstanced = nullptr;
+PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC	glDrawElementsInstancedBaseVertex = nullptr;
 
 //================== GL 4.5 ==============================
 PFNGLCLIPCONTROLPROC					glClipControl = nullptr;
@@ -85,9 +99,10 @@ bool InitGLEXT()
 	GL_DECL_PFN(PFNGLVERTEXATTRIBPOINTERPROC,		glVertexAttribPointer);
 	GL_DECL_PFN(PFNGLBINDVERTEXARRAYPROC,			glBindVertexArray);
 	GL_DECL_PFN(PFNGLGENVERTEXARRAYSPROC,			glGenVertexArrays);
-	GL_DECL_PFN(PFNGLCREATEVERTEXARRAYSPROC,			glCreateVertexArrays);
-	GL_DECL_PFN(PFNGLVERTEXATTRIBDIVISORPROC		,glVertexAttribDivisor);
+	GL_DECL_PFN(PFNGLCREATEVERTEXARRAYSPROC,		glCreateVertexArrays);
+	GL_DECL_PFN(PFNGLVERTEXATTRIBDIVISORPROC,		glVertexAttribDivisor);
 	GL_DECL_PFN(PFNGLDRAWARRAYSINSTANCEDPROC,		glDrawArraysInstanced);
+	GL_DECL_PFN(PFNGLDRAWELEMENTSBASEVERTEXPROC,	glDrawElementsBaseVertex);
 
 	GL_DECL_PFN(PFNGLDELETEBUFFERSPROC,				glDeleteBuffers);
 	GL_DECL_PFN(PFNGLDELETEVERTEXARRAYSPROC,			glDeleteVertexArrays);
@@ -112,11 +127,25 @@ bool InitGLEXT()
 	GL_DECL_PFN(PFNGLBINDTEXTUREUNITPROC		,glBindTextureUnit);
 	GL_DECL_PFN(PFNGLGENERATEMIPMAPPROC			,glGenerateMipmap);
 	//GL_DECL_PFN(PFNGLTEXSUBIMAGE2DEXTPROC		,glTexSubImage2D);
+
+	GL_DECL_PFN(PFNGLGENFRAMEBUFFERSPROC			,glGenFramebuffers);
+	GL_DECL_PFN(PFNGLBINDFRAMEBUFFERPROC			,glBindFramebuffer);
+	GL_DECL_PFN(PFNGLFRAMEBUFFERTEXTURE2DPROC	,glFramebufferTexture2D);
+	GL_DECL_PFN(PFNGLDRAWBUFFERSPROC				,glDrawBuffers);
+	GL_DECL_PFN(PFNGLGENRENDERBUFFERSPROC		,glGenRenderbuffers);
+	GL_DECL_PFN(PFNGLBINDRENDERBUFFERPROC		,glBindRenderbuffer);
+	GL_DECL_PFN(PFNGLRENDERBUFFERSTORAGEPROC		,glRenderbufferStorage);
+	GL_DECL_PFN(PFNGLFRAMEBUFFERRENDERBUFFERPROC ,glFramebufferRenderbuffer);
+	GL_DECL_PFN(PFNGLCHECKFRAMEBUFFERSTATUSPROC	,glCheckFramebufferStatus);
+	GL_DECL_PFN(PFNGLBLITFRAMEBUFFERPROC			,glBlitFramebuffer);
 		
 	GL_DECL_PFN(PFNGLNAMEDBUFFERSUBDATAEXTPROC	,glNamedBufferSubDataEXT);
 	GL_DECL_PFN(PFNGLBINDBUFFERBASEPROC			,glBindBufferBase);
 	GL_DECL_PFN(PFNGLCOMPRESSEDTEXIMAGE2DARBPROC,glCompressedTexImage2DARB);
 	GL_DECL_PFN(PFNGLBINDBUFFERRANGEPROC		,glBindBufferRange);
+	GL_DECL_PFN(PFNGLDRAWELEMENTSINSTANCEDPROC				,glDrawElementsInstanced);
+	GL_DECL_PFN(PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC	,glDrawElementsInstancedBaseVertex);
+
 
 	GL_DECL_PFN(PFNGLCLIPCONTROLPROC				,glClipControl);
 

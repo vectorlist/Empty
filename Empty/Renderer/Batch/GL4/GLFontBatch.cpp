@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <renderer/batch/GL4/GLFontBatch.h>
 
 #include <ft2build.h>
@@ -35,7 +35,7 @@ void GLFontBatch::Init(const char* filename, int size)
 	info.type = BufferType::BUFFER_DYNAMIC;
 	info.binding = BufferBinding::BIND_UNIFORM;
 
-	mUbo = BufferCache::CreateUniformBuffer(info);
+	mUbo = BufferCache::CreateUniformBuffer(&info);
 
 	Viewport vp;
 	GContext->GetViewport(vp);
@@ -114,12 +114,15 @@ void GLFontBatch::EndBatch()
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(FontInstanceVertex) * instanceCounts,
 		mVertices.get());
 
+	//TODO : Disable Depth Fighting
 	GContext->SetBlendState(true);
+	GContext->SetDepthStencil(false);
 	//draw 6 index at once 0 1 2 2 1 3 6times
 	glBindVertexArray(mVao);
 	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, instanceCounts);
 	glBindVertexArray(0);
 	GContext->SetBlendState(false);
+	GContext->SetDepthStencil(true);
 	mShader->UnBind();
 
 	//render Instance

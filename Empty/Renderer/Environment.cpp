@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include "Environment.h"
 
 #include <Cache/BufferCache.h>
@@ -16,6 +16,10 @@
 SkyCube::SkyCube()
 {
 	Init();
+}
+
+SkyCube::~SkyCube()
+{
 }
 
 void SkyCube::Init()
@@ -96,33 +100,26 @@ void SkyCube::Init()
 
 	//================= TEXTURE ====================
 	std::vector<std::string> cubemap = {
-		"../data/texture/cube/FT.jpg",
-		"../data/texture/cube/BK.jpg",
-		"../data/texture/cube/RT.jpg",
-		"../data/texture/cube/LF.jpg",
-		"../data/texture/cube/UP.jpg",
-		"../data/texture/cube/DN.jpg"
+		"../data/texture/clearsky/FT.jpg",
+		"../data/texture/clearsky/BK.jpg",
+		"../data/texture/clearsky/RT.jpg",
+		"../data/texture/clearsky/LF.jpg",
+		"../data/texture/clearsky/UP.jpg",
+		"../data/texture/clearsky/DN.jpg"
 	};
 
 	//std::vector<std::string> cubemap = {
-	//	"../data/texture/sky/front.jpg",
-	//	"../data/texture/sky/back.jpg",
-	//	"../data/texture/sky/right.jpg",
-	//	"../data/texture/sky/left.jpg",
-	//	"../data/texture/sky/top.jpg",
-	//	"../data/texture/sky/bottom.jpg"
+	//	"../data/texture/hazesky/FT.jpg",
+	//	"../data/texture/hazesky/BK.jpg",
+	//	"../data/texture/hazesky/RT.jpg",
+	//	"../data/texture/hazesky/LF.jpg",
+	//	"../data/texture/hazesky/UP.jpg",
+	//	"../data/texture/hazesky/DN.jpg"
 	//};
 
 	this->InitFromImages(cubemap);
 
 	if (GContext->GetApiType() == GraphicAPI::DIRECTX11) {
-		D3D11_DEPTH_STENCIL_DESC depthStencilInfo{};
-		depthStencilInfo.DepthEnable = true;
-		depthStencilInfo.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;		//mask cube
-																			//at a depth less than or equad to an existing depth
-		depthStencilInfo.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-		LOG_HR << G_DXDevice->CreateDepthStencilState(&depthStencilInfo, &mDepthStencilState);
-
 		D3D11_SAMPLER_DESC d3dSamplerDesc;
 		ZeroMemory(&d3dSamplerDesc, sizeof(D3D11_SAMPLER_DESC));
 		d3dSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -134,18 +131,13 @@ void SkyCube::Init()
 		d3dSamplerDesc.MaxLOD = 0;
 		LOG_HR << G_DXDevice->CreateSamplerState(&d3dSamplerDesc, &mSamplerState);
 	}
-	else if (GContext->GetApiType() == GraphicAPI::OPENGL45) {
-
-	}
-
-
 }
 
 bool SkyCube::InitFromImages(const std::vector<std::string>& images)
 {
 	//More Conditional
 	for (int i = 0; i < images.size(); ++i) {
-		mTextures[i] = TextureCache::LoadTextureImage(images[i].c_str());
+		mTextures[i] = TextureCache::LoadTexture(images[i].c_str());
 	}
 	
 	//Create Sampler
@@ -157,35 +149,26 @@ bool SkyCube::InitFromImages(const std::vector<std::string>& images)
 
 void SkyCube::Render()
 {
-	////if (mDepthStencilState) {
-	////	G_DXContext->OMSetDepthStencilState(mDepthStencilState, 1);
-	////}
-
 	DepthStencilState state;
-	state.Enabled = false;
-	state.Mask = DepthMask::NONE;
-	//GPU Submit wrong
+	state.Enabled = true;
+	state.Mask = DepthMask::ALL;
+	state.Func = DepthFunc::LESS_EQUAL;
+
 	GContext->SetDepthStencilEx(&state);
+	
 	mShader->Bind();
 
-	
 	for (int i = 0; i < mVerticesBuffers.size(); ++i) {
 		mVerticesBuffers[i]->Bind();
 		mTextures[i]->Bind(0);
-		if (mDepthStencilState) {
-			G_DXContext->OMSetDepthStencilState(mDepthStencilState, 1);
-		}
+		
 		if (mSamplerState) {
 			G_DXContext->PSSetSamplers(0, 1, &mSamplerState);
 		}
-		mIndexBuffer->RenderIndexed(Topology::TRIANGLE_STRIP, 4);
+		mIndexBuffer->Bind();
+		mIndexBuffer->DrawIndexed(Topology::TRIANGLE_STRIP, 4);
 	}
-
-	state.Enabled = true;
-	state.Mask = DepthMask::ALL;
+	
+	state.Func = DepthFunc::LESS;
 	GContext->SetDepthStencilEx(&state);
-
-	if (mDepthStencilState)
-		G_DXContext->OMSetDepthStencilState(0, 0);
-
 }

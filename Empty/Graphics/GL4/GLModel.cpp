@@ -1,7 +1,8 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Graphics/GL4/GLModel.h>
 #include <Graphics/GL4/GLConfig.h>
 #include <Graphics/TypeTransform.h>
+#include <Graphics/Texture.h>
 
 GLModel::GLModel()
 {
@@ -18,91 +19,61 @@ GLModel::~GLModel()
 
 void GLModel::CreateBuffer(std::vector<Vertex>& vertice, std::vector<uint>& indices)
 {
-	//create buffer
-	//glGenVertexArrays(1, &vao);
+
 	glCreateVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ibo);
 
-	//start vao grab
 	glBindVertexArray(vao);
-
-	//vertices
+	//VERTEX
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertice.size(), vertice.data(), GL_STATIC_DRAW);
-	//indices
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indices.size(), indices.data(), GL_STATIC_DRAW);
-
-	//create input layout
-	//layout index, data per size, type, normalize? , stride, offset
-	//VETEX
+	
+	//ATTRIBS
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-
-	//NORMAL
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 		(GLvoid*)offsetof(Vertex, Vertex::normal));
-
-	//ST
-	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 		(GLvoid*)offsetof(Vertex, Vertex::st));
-
-	//BINORMAL
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 		(GLvoid*)offsetof(Vertex, Vertex::binormal));
-
-	//TANGENT
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 		(GLvoid*)offsetof(Vertex, Vertex::tangent));
 
-	//close VAO
+	//OPTIONAL INSTANCING (you can use InstanceVS.glsl or ForwardVS.glsl)
+	//Just define instance VBO (updating on rumtime)
+	glGenBuffers(1, &instancedVbo);
+	glBindBuffer(GL_ARRAY_BUFFER, instancedVbo);
+
+	for (uint i = 0; i < 4; ++i)
+	{
+		glEnableVertexAttribArray(5 + i);
+		glVertexAttribPointer(5 + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4x4), 
+			(void*)(sizeof(float) * i * 4));
+		//Enable to Instancing
+		glVertexAttribDivisor(5 + i, 1);
+	}
+
+	//INDEX
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint) * indices.size(), indices.data(), GL_STATIC_DRAW);
+
+
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, NULL);
 	
 	mIndiceNum = (uint)indices.size();
 	mHasBuffer = true;
-	mMesh.SetIndexedVertices(vertice.data(), indices.data(), indices.size());
 }
 
-void GLModel::CreateBuffer(ModelCreateInfo& info)
-{
-
-	glCreateVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ibo);
-
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, info.VerticesSize, info.pVertices, GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.IndicesSize, info.pIndices, GL_STATIC_DRAW);
-
-	for (int i = 0; i < info.AttribSize; ++i)
-	{
-		glEnableVertexAttribArray(i);
-		VertexAttrib attb = info.pAttrib[i];
-		glVertexAttribPointer(i,
-			attb.FormatSize,
-			GLTransform::GetVertextFormat(attb.Format),
-			GL_FALSE,
-			attb.Stride,
-			(void*)attb.Offset);
-	}
-
-	//close VAO
-	glBindVertexArray(0);
-
-	mIndiceNum = info.IndicesSize;
-	mHasBuffer = true;
-	//TODO bool possible mesh
-	//mMesh.SetIndexedVertices(vertice.data(), indices.data(), indices.size());
-}
 
 void GLModel::Bind()
 {
@@ -113,7 +84,39 @@ void GLModel::Bind()
 void GLModel::Render()
 {
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, mIndiceNum, GL_UNSIGNED_INT, nullptr);	//bind vao already
+
+	for (uint i = 0; i < mNodes.size(); ++i) 
+	{
+		if (mNodes[i].texture) {
+			mNodes[i].texture->Bind(0);
+		}
+		/*if (i == 1) continue;*/
+		glDrawElements(GL_TRIANGLES, mNodes[i].IndicesNum, GL_UNSIGNED_INT, 
+			(void*)(sizeof(uint) * mNodes[i].IndicesOffset));
+	}
 
 	glBindVertexArray(0);
+}
+
+void GLModel::RenderInstnaced(uint instanceNum, const Matrix4x4* data)
+{
+	//Upload data to GPU
+	glBindBuffer(GL_ARRAY_BUFFER, instancedVbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Matrix4x4) * instanceNum, data, GL_DYNAMIC_DRAW);
+
+	//Bind VAO
+	glBindVertexArray(vao);
+
+	for (uint i = 0; i < mNodes.size(); ++i)
+	{
+		//TEXTURE PER NODe
+		if (mNodes[i].texture) {
+			mNodes[i].texture->Bind(0);
+		}
+
+		glDrawElementsInstanced(GL_TRIANGLES, mNodes[i].IndicesNum, GL_UNSIGNED_INT,
+			(void*)(sizeof(uint) * mNodes[i].IndicesOffset), instanceNum);
+	}
+
+	glBindVertexArray(NULL);
 }

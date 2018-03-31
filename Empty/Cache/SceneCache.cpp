@@ -1,9 +1,10 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Cache/SceneCache.h>
 #include <Scene/Scene.h>
 
 Scene* SceneCache::currentScene = nullptr;
 Scene* SceneCache::queuedScene = nullptr;
+std::map<std::string, std::shared_ptr<Scene>> SceneCache::mScenes;
 
 SceneCache::~SceneCache()
 {
@@ -32,6 +33,7 @@ void SceneCache::Update(float delta)
 
 void SceneCache::Render()
 {
+
 	if (currentScene)
 		currentScene->Render();
 }

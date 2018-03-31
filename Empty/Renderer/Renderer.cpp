@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Renderer/Renderer.h>
 #include <Window/Applicationinfo.h>
 #include <Cache/SceneCache.h>
@@ -13,6 +13,8 @@
 #include <Renderer/Batch/GL4/GLFontBatch.h>
 #include <Renderer/Batch/DX11/DXFontBatch.h>
 
+#include <Renderer/Batch/SpriteBatch.h>
+
 Renderer::Renderer()
 	: mContext(nullptr), mSceneCache(nullptr), mInput(nullptr), mDebugBatch(nullptr), mFontBatch(nullptr)
 {
@@ -20,6 +22,7 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
+	SAFE_DELETE(mSpriteBatch);
 	SAFE_DELETE(mInput);
 	SAFE_DELETE(mDebugBatch);
 	SAFE_DELETE(mFontBatch);
@@ -56,7 +59,7 @@ void Renderer::Init(uint width, uint height, void* hwnd, bool vsync)
 		break;
 	}
 
-	//FONT BATCH
+	//FONT BATCH (TODO : Replace Internal Batches)
 	switch (info->apiType)
 	{
 	case GraphicAPI::OPENGL45:
@@ -71,6 +74,9 @@ void Renderer::Init(uint width, uint height, void* hwnd, bool vsync)
 		ASSERT_MSG(0, "failed to create font batch");
 		break;
 	}
+
+	//Test Without Chooseing API
+	mSpriteBatch = new SpriteBatch;
 
 	mSceneCache = G_SceneCache;
 	mInput = new Input(hwnd);

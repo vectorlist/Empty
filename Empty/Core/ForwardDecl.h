@@ -19,15 +19,17 @@ class DXShader;
 
 class Terrain;
 
-//============ BUFFERS ============================
+//================= BUFFERS =======================
 class Buffer;
 class UniformBuffer;
 class VertexBuffer;
 class IndexBuffer;
+class FrameBuffer;
 
 //============ BATCH / RENDERER ===================
 class DebugBatch;
 class FontBatch;
+class SpriteBatch;
 
 //============ PHYSICS ============================
 class BVHTreeNode;
@@ -54,6 +56,10 @@ struct ID3D11ShaderResourceView;
 struct ID3D11Buffer;
 struct ID3D11InputLayout;
 struct ID3D11SamplerState;
+struct ID3D11Texture2D;
+struct ID3D11RenderTargetView;
+struct ID3D11DepthStencilView;
+struct D3D11_VIEWPORT;
 
 //============== IMAGE ============================
 class	Image;

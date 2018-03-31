@@ -2,6 +2,9 @@
 
 #include <graphics/model.h>
 
+//Pre Define instan buffer size
+#define		MAX_INSTANCE_PER_MODEL	32768		
+
 class ID3D11Buffer;
 class DXModel : public Model
 {
@@ -10,20 +13,17 @@ public:
 	virtual~DXModel();
 
 	void CreateBuffer(std::vector<Vertex> &vertice, std::vector<uint> &indice) override;
-	void CreateBuffer(ModelCreateInfo& info) override;
+	
 	void Bind() override;
 	void Render() override;
+	void RenderInstnaced(uint instanceNum, const Matrix4x4* data);
 
+	//Instancing (Matrix4x4)
+	static ID3D11Buffer* gInstanceBuffer;
+private:
 	ID3D11Buffer* mVertexBuffer;
 	ID3D11Buffer* mIndexBuffer;
-
-	//optional
-	void CreateInputLayout(ModelCreateInfo& info);
 	ID3D11InputLayout* mInputLayout;
-
-	//Stride
-	uint mStride = 0;
-	uint mOffset = 0;
 };
 
 //typedef struct D3D11_INPUT_ELEMENT_DESC {
@@ -64,3 +64,17 @@ public:
 //This value must be 0 for an element that contains per - vertex data(the slot class is set to D3D11_INPUT_PER_VERTEX_DATA)
 
 //{ "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+//D3D11_BUFFER_DESC desc;
+//ZeroMemory(&desc, sizeof(desc));
+//desc.Usage = D3D11_USAGE_DYNAMIC;
+//desc.ByteWidth = size;
+//desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+//desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+//d3dDevice->CreateBuffer(&desc, initialVertexData, &vertexBuffer);
+//Now that you have a dynamic vertex buffer, you can update it using ID3D11DeviceContext::Map and ID3D11DeviceContext::Unmap.Example:
+//
+//D3D11_MAPPED_SUBRESOURCE resource;
+//d3dDeviceContext->Map(vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+//memcpy(resource.pData, sourceData, vertexDataSize);
+//d3dDeviceContext->Unmap(vertexBuffer, 0);

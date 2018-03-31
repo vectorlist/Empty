@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 
 #include <Graphics/GL4/GLVertexBuffer.h>
 #include <Graphics/GL4/GLConfig.h>
@@ -26,7 +26,8 @@ void GLVertexBuffer::Init(VertexBufferCreateInfo* info)
 		glBufferData(GL_ARRAY_BUFFER, info->VerticesSize, info->pVertices, GL_STATIC_DRAW);
 	}
 	else {
-		glBufferData(GL_ARRAY_BUFFER, info->VerticesSize, info->pVertices, GL_DYNAMIC_DRAW);
+		//DYNAMIC depend on SubData
+		//glBufferData(GL_ARRAY_BUFFER, info->VerticesSize, info->pVertices, GL_DYNAMIC_DRAW);
 	}
 
 	for (uint i = 0; i < info->AttribSize; ++i)
@@ -43,6 +44,17 @@ void GLVertexBuffer::Init(VertexBufferCreateInfo* info)
 void GLVertexBuffer::SubData(uint offset, uint size, void * data)
 {
 	//TODO : map and un map
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, offset, size, data);
+	glBindBuffer(GL_ARRAY_BUFFER, NULL);
+}
+
+void GLVertexBuffer::DrawArray(Topology topology, uint offset, uint count)
+{
+	glBindVertexArray(vao);
+	glDrawArrays(GLTransform::GetTopology(topology), offset, count);
+	glBindVertexArray(0);
 }
 
 void GLVertexBuffer::Bind()

@@ -8,7 +8,7 @@ public:
 	GLTexture();
 	virtual~GLTexture();
 
-	void InitFromFile(const std::string& filename) override;
+	void InitFromDDS(const std::string& filename) override;
 	void InitFromImage(const std::string& filename) override;
 	void Init(TextureCreateInfo& info) override;		//TODO Fix
 	void Bind(uint index) override;

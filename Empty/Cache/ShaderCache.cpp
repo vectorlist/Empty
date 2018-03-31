@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Cache/ShaderCache.h>
 #include <Graphics/BuiltInShader.h>
 #include <Graphics/Context.h>
@@ -100,13 +100,18 @@ Shader* ShaderCache::CreateShader(const std::string& vs, const std::string& fs)
 	{
 	case GraphicAPI::OPENGL45:
 	{
-		VS += FileSystem::SHADER_DIR + vs + "." + "glsl";
-		if (!FileSystem::FileExist(VS)) {
+		VS += FileSystem::SHADER_DIR + vs + ".glsl";
+		if (!FileSystem::IsFileExist(VS)) {
 			ASSERT_MSG(0, (std::string("failed to find glsl file") + VS).c_str());
 		}
-		PS += FileSystem::SHADER_DIR + fs + "." + "glsl";
-		if (!FileSystem::FileExist(VS)) {
+		PS += FileSystem::SHADER_DIR + fs + ".glsl";
+		if (!FileSystem::IsFileExist(PS)) {
 			ASSERT_MSG(0, (std::string("failed to find glsl file") + VS).c_str());
+		}
+
+		auto found = mExternalShader.find(VS + PS);
+		if (found != mExternalShader.end()) {
+			return found->second.get();
 		}
 
 		shader = std::make_shared<GLShader>();
@@ -117,13 +122,18 @@ Shader* ShaderCache::CreateShader(const std::string& vs, const std::string& fs)
 	
 	case GraphicAPI::DIRECTX11:
 	{
-		VS += FileSystem::SHADER_DIR + vs + "." + "hlsl";
-		if (!FileSystem::FileExist(VS)) {
+		VS += FileSystem::SHADER_DIR + vs + ".hlsl";
+		if (!FileSystem::IsFileExist(VS)) {
 			ASSERT_MSG(0, (std::string("failed to find hlsl file :") + VS).c_str());
 		}
-		PS += FileSystem::SHADER_DIR + fs + "." + "hlsl";
-		if (!FileSystem::FileExist(VS)) {
+		PS += FileSystem::SHADER_DIR + fs + ".hlsl";
+		if (!FileSystem::IsFileExist(PS)) {
 			ASSERT_MSG(0, (std::string("failed to find hlsl file : ") + VS).c_str());
+		}
+
+		auto found = mExternalShader.find(VS + PS);
+		if (found != mExternalShader.end()) {
+			return found->second.get();
 		}
 
 		shader = std::make_shared<DXShader>();

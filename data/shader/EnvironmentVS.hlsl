@@ -2,7 +2,6 @@ cbuffer matrices : register(b0)
 {
 	matrix proj;
 	matrix view;
-	matrix model;		//not used
 };
 
 struct VS_In

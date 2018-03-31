@@ -7,7 +7,6 @@ layout(std140, row_major, binding = 0) uniform UBO
 {
 	mat4 proj;
 	mat4 view;
-	mat4 model;
 };
 
 out PS{

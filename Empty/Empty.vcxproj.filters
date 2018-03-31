@@ -61,23 +61,20 @@
     <Filter Include="Empty\Physics\Tree">
       <UniqueIdentifier>{9fd03843-a69c-4671-a348-088366d53170}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Empty\External">
+    <Filter Include="Empty\Engine">
       <UniqueIdentifier>{dba591f5-e75a-4d00-bc18-dddb576fb6d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Empty\External\Shader">
+    <Filter Include="Empty\Engine\Shader">
       <UniqueIdentifier>{87c31d3a-6191-452c-be49-83e103bad74c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Empty\External\Shader\HLSL">
+    <Filter Include="Empty\Engine\Shader\HLSL">
       <UniqueIdentifier>{c19e9401-fc21-4142-956d-1c078fd7a750}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Empty\External\Shader\GLSL">
+    <Filter Include="Empty\Engine\Shader\GLSL">
       <UniqueIdentifier>{5e858fb0-840e-42d6-90cb-09baadb52005}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PCH.cpp">
-      <Filter>Empty</Filter>
-    </ClCompile>
     <ClCompile Include="renderer\batch\FontBatch.cpp">
       <Filter>Empty\Renderer\Batch</Filter>
     </ClCompile>
@@ -255,6 +252,30 @@
     <ClCompile Include="Renderer\Environment.cpp">
       <Filter>Empty\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Renderer\Batch\SpriteBatch.cpp">
+      <Filter>Empty\Renderer\Batch</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\PCH.cpp">
+      <Filter>Empty\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Profiler.cpp">
+      <Filter>Empty\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\CullManager.cpp">
+      <Filter>Empty\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\FrameBuffer.cpp">
+      <Filter>Empty\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GL4\GLFrameBuffer.cpp">
+      <Filter>Empty\Graphics\GL4</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\DX11\DXFrameBuffer.cpp">
+      <Filter>Empty\Graphics\DX11</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Random.cpp">
+      <Filter>Empty\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="math\vec2f.h">
@@ -271,9 +292,6 @@
     </ClInclude>
     <ClInclude Include="math\quaternion.h">
       <Filter>Empty\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="PCH.h">
-      <Filter>Empty</Filter>
     </ClInclude>
     <ClInclude Include="math\math.h">
       <Filter>Empty\Math</Filter>
@@ -500,19 +518,102 @@
     <ClInclude Include="Graphics\Sampler.h">
       <Filter>Empty\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Renderer\Batch\SpriteBatch.h">
+      <Filter>Empty\Renderer\Batch</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PCH.h">
+      <Filter>Empty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Profiler.h">
+      <Filter>Empty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\CullManager.h">
+      <Filter>Empty\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\FrameBuffer.h">
+      <Filter>Empty\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GL4\GLFrameBuffer.h">
+      <Filter>Empty\Graphics\GL4</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\DX11\DXFrameBuffer.h">
+      <Filter>Empty\Graphics\DX11</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Random.h">
+      <Filter>Empty\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\data\shader\EnvironmentPS.hlsl">
-      <Filter>Empty\External\Shader\HLSL</Filter>
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
     </None>
     <None Include="..\data\shader\EnvironmentVS.hlsl">
-      <Filter>Empty\External\Shader\HLSL</Filter>
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
     </None>
     <None Include="..\data\shader\EnvironmentPS.glsl">
-      <Filter>Empty\External\Shader\GLSL</Filter>
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
     </None>
     <None Include="..\data\shader\EnvironmentVS.glsl">
-      <Filter>Empty\External\Shader\GLSL</Filter>
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
     </None>
+    <None Include="..\data\shader\SpriteVS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\SpritePS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\SpriteVS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\ForwardVS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\ForwardPS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\InstanceVS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\ForwardPS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\ForwardVS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\InstanceVS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\GBufferPS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\GBufferPS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\GBufferVS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\DeferredVS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\DeferredPS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\ScreenPS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </None>
+    <None Include="..\data\shader\DeferredVS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+    <None Include="..\data\shader\DeferredPS.hlsl">
+      <Filter>Empty\Engine\Shader\HLSL</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\data\shader\SpritePS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </Text>
+    <Text Include="..\data\shader\GBufferVS.glsl">
+      <Filter>Empty\Engine\Shader\GLSL</Filter>
+    </Text>
   </ItemGroup>
 </Project>

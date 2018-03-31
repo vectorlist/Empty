@@ -7,7 +7,7 @@ class ModelCache
 public:
 
 	static Model* LoadModel(const std::string& filename);
-	static Model* CreateModel(ModelCreateInfo& info);
+	//static Model* CreateModel(ModelCreateInfo& info);
 	
 	static std::unordered_map<std::string, std::shared_ptr<Model>> mExternalModels;
 	//TODO : replace hash key

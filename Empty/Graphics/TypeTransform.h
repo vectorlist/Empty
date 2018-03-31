@@ -4,14 +4,6 @@
 
 enum DXGI_FORMAT;
 enum D3D_PRIMITIVE_TOPOLOGY;
-namespace deform
-{
-	DXGI_FORMAT GetDXFormat(Format format);
-	//format type sperate type num and type
-	uint		GetGLFormatDemention(Format format);
-	uint		GetGLFormat(Format format);
-}
-
 
 typedef unsigned int GLenum;
 typedef unsigned char GLboolean;
@@ -23,12 +15,15 @@ namespace GLTransform
 {
 GLenum GetVertextFormat(VertexFormat format);
 GLenum GetTopology(Topology topology);
+GLenum GetInternalFormat(Format format);
+GLenum GetFormat(Format format);
 }
 
 namespace DXTransform
 {
 DXGI_FORMAT				GetVertexFormat(VertexFormat format, uint formatSize);
 D3D_PRIMITIVE_TOPOLOGY	GetTopology(Topology topology);
+DXGI_FORMAT GetFormat(Format format);
 }
 
 //#define GL_RED 0x1903

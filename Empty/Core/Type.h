@@ -103,14 +103,24 @@ enum class Format
 {
 	//TODO : Add more formats
 	FORMAT_UNKNOWN = 0,
-	FORMAT_R32G32B32A32_UINT,
-	FORMAT_R32G32B32_UINT,
-	FORMAT_R16G16B16A16_UINT,
-	FORMAT_R16G16_UINT,
-	FORMAT_R8G8B8A8_UINT,
-	FORMAT_R8G8_UINT,
-	FORMAT_R8_UNORM,
+	FORMAT_RGBA32_UINT,
+	FORMAT_RGBA32_FLOAT,
+	FORMAT_RGB32_UINT,
+	FORMAT_RGB32_FLOAT,
+	FORMAT_R32_UINT,
+	FORMAT_R32_FLOAT,
+	FORMAT_RGBA16_UNIT,
+	FORMAT_RGBA16_FLOAT,
+	FORMAT_RGB16_UINT,
+	FORMAT_RGB16_FLOAT,
+	FORMAT_R16_UINT,
+	FORMAT_R16_FLOAT,
+	FORMAT_RGBA8_UINT,
+	FORMAT_RGBA8_UNORM,
+	FORMAT_RGB8_UINT,
+	FORMAT_RGB8_UNORM,
 	FORMAT_R8_UINT,
+	FORMAT_R8_UNORM
 };
 
 //TODO : make Device CPP
@@ -170,12 +180,12 @@ struct InputLayout
 
 enum class Topology : Enum
 {
-	POINT = 0xF0F0,
-	LINE,
+	POINTS = 0xF0F0,
+	LINES,
 	LINE_STRIP,
-	TRIANGLE,
+	TRIANGLES,
 	TRIANGLE_STRIP,
-	QUAD,
+	QUADS,
 	UNKWON
 };
 
@@ -266,6 +276,13 @@ struct TriangleIndex
 
 //================ RASTER STATE ====================
 
+enum class CullMode : uint
+{
+	FRONT = 0x00FF,
+	BACK,
+	FRONT_AND_BACK,
+	NONE
+};
 
 //================ DEPTH STATE =====================
 
@@ -274,6 +291,7 @@ enum class DepthMask : uint
 	NONE = 0x00,
 	ALL = 0xFF
 };
+
 enum class DepthFunc : uint
 {
 	LESS = 0U,
@@ -294,9 +312,25 @@ struct DepthStencilState
 
 //============== SAMPLER STATE ===================
 
-
-
 struct SamplerCreateInfo
 {
 
+};
+
+//=============== FRAME BUFFER ===================
+
+enum FrameBufferType : uint
+{
+	FRAMEBUFFER_SINGLE				= 1 << 0,
+	FRAMEBUFFER_MTR					= 1 << 1,
+	FRAMEBUFFER_MTR_DEPTHSTENCIL	= 1 << 2,
+};
+
+struct FrameBufferCreateInfo
+{
+	uint Width;
+	uint Height;
+	uint BufferCount;
+	Format BufferFormat;
+	FrameBufferType Type;
 };

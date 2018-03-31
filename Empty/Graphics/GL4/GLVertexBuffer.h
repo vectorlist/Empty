@@ -14,7 +14,7 @@ public:
 	void UnBind() override;
 
 	void SubData(uint offset, uint size, void* data) override;
-	
+	void DrawArray(Topology topology, uint offset, uint count) override;
 	uint vao;
 	uint vbo;
 	

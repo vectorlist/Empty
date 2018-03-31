@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 
 #include <Image/Mipmap.h>
 #include <Math/math.h>
@@ -66,10 +66,7 @@ bool Mipmap::GenerateMipmap(void* pixels, uint width, uint height, uint bytePerP
 		dstBuffer.height = dstH;
 		dstBuffer.bytePerPixel = mBytePerPixel;
 		mPixelBuffers.emplace_back(dstBuffer);
-
 	}
-
-
 	return true;
 }
 
@@ -207,7 +204,6 @@ uint Mipmap::GetTotalMipmapByte(uint width, uint height, uint bytePerPixel)
 		height = std::max(1U, height >> 1);
 		nBytes += width * height * bytePerPixel;
 	}
-
 	return nBytes;
 }
 

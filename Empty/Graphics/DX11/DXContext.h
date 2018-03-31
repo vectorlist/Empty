@@ -25,12 +25,17 @@ public:
 
 	//=================== API Extension ======================
 
-	void SetDepthStencilEx(DepthStencilState* state);
-
+	void SetDepthStencilEx(DepthStencilState* state) override;
+	void SetCullMode(CullMode mode) override;
 	//================= External =============================
 
 	void SetWireFrameState(bool enable);
 	void SetMainRenderTargetView();
+
+	//================= Internal =============================
+	void* GetDepthStencilView() override { return mDepthStencilView; }
+	void* GetDepthStencilTexture() { return mDepthStencilBuffer; }
+	void* GetRenderTargetView() { return mRenderTargetView; }
 
 	//Core
 	ID3D11Device*			mDevice;
@@ -39,8 +44,8 @@ public:
 
 	//state and usages
 	ID3D11RenderTargetView*		mRenderTargetView;
+
 	ID3D11Texture2D*			mDepthStencilBuffer;
-	/*ID3D11DepthStencilState*	mDepthStencilState;*/
 	ID3D11DepthStencilView*		mDepthStencilView;
 
 	D3D11_VIEWPORT				mViewPort;
@@ -51,7 +56,10 @@ public:
 		ID3D11DepthStencilState*	depthStencilEnable;
 		ID3D11DepthStencilState*    depthStencilDisable;
 		//raster
-		ID3D11RasterizerState*		rasterSolidState;
+		ID3D11RasterizerState*		rasterSolidCullBack;		//Default
+		ID3D11RasterizerState*		rasterSolidCullFront;		//Default
+		ID3D11RasterizerState*		rasterSolidCullNone;
+		
 		ID3D11RasterizerState*		rasterWireFrameState;
 
 		ID3D11BlendState*			blendenable;
@@ -63,10 +71,16 @@ public:
 
 	struct 
 	{
-		ID3D11DepthStencilState*	depthStencilMaskedAll;
-		ID3D11DepthStencilState*	depthStencilMaskedNone;
-	}preState;
+		ID3D11DepthStencilState*	EnableMaskedAllCompLess;
+		ID3D11DepthStencilState*	EnableMaskedAllCompLessEqual;
 
+		ID3D11DepthStencilState*	DisableMaskedNoneCompNever;
+
+		//Option Raster
+
+
+	}depthStates;
+	ID3D11DepthStencilState* mDepthStates[12];
 private:
 	void Init();
 
@@ -75,3 +89,5 @@ private:
 
 	void CreatePreBuiltStates();
 };
+
+#define DEPTH_STATE_ENABLE_MASK_ZERO_

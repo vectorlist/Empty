@@ -22,6 +22,10 @@ public:
 	//============== Expand Graphics Func ===============
 
 	virtual void SetDepthStencilEx(DepthStencilState* stencilState) {};
+	virtual void SetCullMode(CullMode mode) {};
+
+	//============== Frame Buffer =======================
+	
 
 	//================== Internal =======================
 	void*			GetHwnd() const { return mHwnd; }
@@ -30,6 +34,9 @@ public:
 	GraphicAPI		GetApiType() const { return mApiType; }
 	uint			GetWidth() const { return mWidth; }
 	uint			GetHeight() const { return mHeight; }
+	virtual void*	GetDepthStencilView() { return nullptr; }
+	virtual void*	GetDepthStencilTexture() { return nullptr; }
+	virtual void*	GetRenderTargetView() { return nullptr; }
 
 	static Context*				globalContext;		
 	static ID3D11Device*		globalDXDevice;

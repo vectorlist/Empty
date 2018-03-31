@@ -26,6 +26,7 @@ public:
 	float GetFar() const { return mZfar; }
 	float GetFov() const { return mFovy; }
 	float GetAspect() const { return mAspect; }
+	Frustum GetExtractedFrustum();
 
 	virtual void Update();
 

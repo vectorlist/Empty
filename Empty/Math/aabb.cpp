@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <math/aabb.h>
 
 //======================== SPHERE =================================
@@ -23,6 +23,11 @@ void BSpehre::GetWorldCenterRadius(const Matrix4x4& world, vec3f * pCenter, floa
 AABB::AABB(const vec3f& min, const vec3f& max)
 	: BSpehre(min, max), min(min), max(max)
 {
+}
+
+AABB::AABB(const AABB& aabb)
+{
+	this->Init(aabb.min, aabb.max);
 }
 
 AABB  AABB::GetTransformedAABB(const Matrix4x4& world)

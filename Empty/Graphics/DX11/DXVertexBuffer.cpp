@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Graphics/DX11/DXVertexBuffer.h>
 #include <Graphics/DX11/DXContext.h>
 #include <Graphics/TypeTransform.h>
@@ -20,14 +20,24 @@ void DXVertexBuffer::Init(VertexBufferCreateInfo* info)
 	bufferInfo.Usage = info->Type != BufferType::BUFFER_DYNAMIC ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 	bufferInfo.ByteWidth = info->VerticesSize;
 	bufferInfo.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufferInfo.CPUAccessFlags = 0;
+	bufferInfo.CPUAccessFlags = info->Type != BufferType::BUFFER_DYNAMIC ? 0 : D3D11_CPU_ACCESS_WRITE;
 	bufferInfo.MiscFlags = 0;
 	bufferInfo.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA bufferData{};
 	bufferData.pSysMem = info->pVertices;
 
-	LOG_HR << G_DXDevice->CreateBuffer(&bufferInfo, &bufferData, &mVbo);
+
+	//LOG_HR << G_DXDevice->CreateBuffer(&bufferInfo, &bufferData, &mVbo);
+	if (bufferInfo.Usage == D3D11_USAGE_DEFAULT) {
+		//STATIC OR DEFAULT
+		LOG_HR << G_DXDevice->CreateBuffer(&bufferInfo, &bufferData, &mVbo);
+	}
+	else {
+		//DYNAMIC
+		LOG_HR << G_DXDevice->CreateBuffer(&bufferInfo, nullptr, &mVbo);
+	}
+	
 
 	CreateInputLayout(*info);
 	mStride = info->pAttrib[0].Stride;
@@ -82,8 +92,15 @@ void DXVertexBuffer::CreateInputLayout(VertexBufferCreateInfo& info)
 	vBlob->Release();
 }
 
-void DXVertexBuffer::SubData(uint offset, uint size, void * data)
+void DXVertexBuffer::SubData(uint offset, uint size, void* data)
 {
+	D3D11_MAPPED_SUBRESOURCE mapped{};
+
+	G_DXContext->Map(mVbo, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+
+	memcpy(mapped.pData, data, size);
+
+	G_DXContext->Unmap(mVbo, 0);
 }
 
 void DXVertexBuffer::Bind()
@@ -95,4 +112,12 @@ void DXVertexBuffer::Bind()
 void DXVertexBuffer::UnBind()
 {
 	//DX dont need to unbind
+}
+
+void DXVertexBuffer::DrawArray(Topology topology, uint offset, uint count)
+{
+	G_DXContext->IASetPrimitiveTopology(DXTransform::GetTopology(topology));
+	G_DXContext->IASetInputLayout(mInputLayout);
+	G_DXContext->IASetVertexBuffers(0, 1, &mVbo, &mStride, &mOffset);
+	G_DXContext->Draw(count, offset);
 }

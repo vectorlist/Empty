@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <World/Terrain.h>
 
 #include <Image/Image.h>
@@ -183,7 +183,7 @@ void Terrain::CreateTerrain(uint nTile, PixelBuffer* buffer, uint nSmooth)
 	info.pAttrib = inputs.data();
 	info.AttribSize = inputs.size();
 
-	mModel = ModelCache::CreateModel(info);
+	//mModel = ModelCache::CreateModel(info);
 
 	//TODO : BSP or Quadtree
 

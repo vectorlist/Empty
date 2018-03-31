@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <scene/scene.h>
 #include <core/object.h>
 
@@ -6,6 +6,9 @@
 
 #include <renderer/batch/debugbatch.h>
 #include <renderer/batch/FontBatch.h>
+#include <Renderer/Batch/SpriteBatch.h>
+
+#include <Core/Profiler.h>
 
 std::map<uint, std::shared_ptr<Object>>			Scene::mInternalObjects;
 std::map<std::string, std::shared_ptr<Camera>>	Scene::mInternalCameras;
@@ -32,12 +35,12 @@ void Scene::Render()
 {
 	RenderScene();
 
-	//priority DEBUG > SPRITE > FONT
-	//Gather Debug Batch
-	//G_DebugBatch->RenderBatch();
-
-	//TODO : sprite batch
-	RenderSprite();
+	//PROFILE SPRITE BATCH
+	if (GSpriteBatch) {
+		GSpriteBatch->BeginBatch();
+		RenderSprite();
+		GSpriteBatch->EndBatch();
+	}
 
 	//Font Batch
 	if (G_FontBatch) {

@@ -11,7 +11,7 @@ public:
 	UniformBuffer(){}
 	virtual~UniformBuffer(){}
 
-	virtual void Init(BufferCreateInfo& info) = 0;
+	virtual void Init(BufferCreateInfo* info) = 0;
 	virtual void Update(const void* data) = 0;
 	virtual void UpdateRanged(uint offset, uint size, const void* data) = 0;
 	virtual void BindVS(uint index) = 0;

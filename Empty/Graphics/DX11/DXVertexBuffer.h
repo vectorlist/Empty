@@ -13,6 +13,7 @@ public:
 	void SubData(uint offset, uint size, void* data) override;
 	void Bind() override;
 	void UnBind() override;
+	void DrawArray(Topology topology, uint offset, uint count);
 
 	void CreateInputLayout(VertexBufferCreateInfo& info);
 protected:

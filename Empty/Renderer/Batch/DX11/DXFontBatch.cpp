@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <renderer/batch/DX11/DXFontBatch.h>
 
 #include <cache/shadercache.h>
@@ -29,7 +29,7 @@ void DXFontBatch::Init(const char* filename, int size)
 	info.pData = nullptr;
 	info.size = sizeof(Matrix4x4);
 
-	mUbo = BufferCache::CreateUniformBuffer(info);
+	mUbo = BufferCache::CreateUniformBuffer(&info);
 
 	Viewport v;
 	GContext->GetViewport(v);

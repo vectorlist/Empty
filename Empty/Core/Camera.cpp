@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 
 #include <core/camera.h>
 #include <graphics/context.h>
@@ -41,6 +41,13 @@ void Camera::Init()
 		break;
 	}
 	
+}
+
+Frustum Camera::GetExtractedFrustum()
+{
+	Frustum frustum;
+	frustum.Extract(mProj, mView);
+	return frustum;
 }
 
 void Camera::Update()

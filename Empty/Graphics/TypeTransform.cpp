@@ -1,70 +1,7 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Graphics/TypeTransform.h>
 #include <Graphics/DX11/DXConfig.h>
 #include <Graphics/GL4/GLConfig.h>
-
-namespace deform
-{
-	DXGI_FORMAT GetDXFormat(Format format)
-	{
-		switch (format)
-		{
-		case Format::FORMAT_R32G32B32A32_UINT:
-			return DXGI_FORMAT_R32G32B32A32_UINT;
-		case Format::FORMAT_R32G32B32_UINT:
-			return DXGI_FORMAT_R32G32B32_UINT;
-		case Format::FORMAT_R16G16B16A16_UINT:
-			return DXGI_FORMAT_R16G16B16A16_UINT;
-		case Format::FORMAT_R16G16_UINT:
-			return DXGI_FORMAT_R16G16_UINT;
-		case Format::FORMAT_R8G8B8A8_UINT:
-			return DXGI_FORMAT_R8G8B8A8_UINT;
-		case Format::FORMAT_R8G8_UINT:
-			return DXGI_FORMAT_R8G8_UINT;
-		case Format::FORMAT_R8_UNORM:
-			//A single-component, 8-bit unsigned-normalized-integer format that supports 8 bits for the red channel.
-			return DXGI_FORMAT_R8_UNORM;
-		case Format::FORMAT_R8_UINT:					//char
-			return DXGI_FORMAT_R8_UINT;
-		case Format::FORMAT_UNKNOWN:
-			return DXGI_FORMAT_UNKNOWN;
-		default:
-			return DXGI_FORMAT_UNKNOWN;
-		}
-	}
-	uint GetGLFormatDemention(Format format)
-	{
-		switch (format)
-		{
-		case Format::FORMAT_R32G32B32A32_UINT:
-			return GL_RGBA32UI;
-		case Format::FORMAT_R8G8B8A8_UINT:
-			return GL_RGBA8_SNORM;
-		case Format::FORMAT_R8_UNORM:
-			return GL_RED;
-		case Format::FORMAT_R8_UINT:
-			return GL_RED;
-		case Format::FORMAT_UNKNOWN:
-			return 0;
-		default:
-			return 0;
-		}
-	}
-	uint GetGLFormat(Format format)
-	{
-		switch (format)
-		{
-		case Format::FORMAT_R8_UNORM:
-			return GL_UNSIGNED_BYTE;
-		case Format::FORMAT_R8_UINT:	
-			return GL_UNSIGNED_INT;
-		case Format::FORMAT_UNKNOWN:
-			return 0;
-		default:
-			return 0;
-		}
-	}
-}
 
 namespace GLTransform
 {
@@ -92,16 +29,104 @@ GLenum GetTopology(Topology topology)
 {
 	switch (topology)
 	{
-	case Topology::POINT:
+	case Topology::POINTS:
 		return GL_POINTS;
-	case Topology::LINE:
+	case Topology::LINES:
 		return GL_LINES;
 	case Topology::LINE_STRIP:
 		return GL_LINE_STRIP;
-	case Topology::TRIANGLE:
+	case Topology::TRIANGLES:
 		return GL_TRIANGLES;
 	case Topology::TRIANGLE_STRIP:
 		return GL_TRIANGLE_STRIP;
+	default:
+		return GL_NONE;
+	}
+}
+GLenum GetInternalFormat(Format format)
+{
+	switch (format)
+	{
+	case Format::FORMAT_RGBA32_UINT:
+		return GL_RGBA32UI;
+	case Format::FORMAT_RGBA32_FLOAT:
+		return GL_RGBA32F;
+	case Format::FORMAT_RGB32_UINT:
+		return GL_RGB32UI;
+	case Format::FORMAT_RGB32_FLOAT:
+		return GL_RGB32F;
+	case Format::FORMAT_R32_UINT:
+		return GL_R32UI;
+	case Format::FORMAT_R32_FLOAT:
+		return GL_R32F;
+	case Format::FORMAT_RGBA16_UNIT:
+		return GL_RGBA16UI;
+	case Format::FORMAT_RGBA16_FLOAT:
+		return GL_RGBA16F;
+	case Format::FORMAT_RGB16_UINT:
+		return GL_RGB16UI;
+	case Format::FORMAT_RGB16_FLOAT:
+		return GL_RGB16F;
+	case Format::FORMAT_R16_UINT:
+		return GL_R16UI;
+	case Format::FORMAT_R16_FLOAT:
+		return GL_R16F;
+	case Format::FORMAT_RGBA8_UINT:
+		return GL_RGBA8UI;
+	case Format::FORMAT_RGBA8_UNORM:
+		return GL_RGBA8;
+	case Format::FORMAT_RGB8_UINT:
+		return GL_RGB8UI;
+	case Format::FORMAT_RGB8_UNORM:
+		return GL_RGB8;
+	case Format::FORMAT_R8_UINT:
+		return GL_R8UI;
+	case Format::FORMAT_R8_UNORM:
+		return GL_R8;
+	default:
+		return GL_NONE;
+	}
+}
+GLenum GetFormat(Format format)
+{
+	switch (format)
+	{
+	case Format::FORMAT_RGBA32_UINT:
+		return GL_RGBA;
+	case Format::FORMAT_RGBA32_FLOAT:
+		return GL_RGBA;
+	case Format::FORMAT_RGB32_UINT:
+		return GL_RGB;
+	case Format::FORMAT_RGB32_FLOAT:
+		return GL_RGB;
+	case Format::FORMAT_R32_UINT:
+		return GL_RED;
+	case Format::FORMAT_R32_FLOAT:
+		return GL_RED;
+	case Format::FORMAT_RGBA16_UNIT:
+		return GL_RGBA;
+	case Format::FORMAT_RGBA16_FLOAT:
+		return GL_RGBA;
+	case Format::FORMAT_RGB16_UINT:
+		return GL_RGB;
+	case Format::FORMAT_RGB16_FLOAT:
+		return GL_RGB;
+	case Format::FORMAT_R16_UINT:
+		return GL_RED;
+	case Format::FORMAT_R16_FLOAT:
+		return GL_RED;
+	case Format::FORMAT_RGBA8_UINT:
+		return GL_RGBA;
+	case Format::FORMAT_RGBA8_UNORM:
+		return GL_RGBA;
+	case Format::FORMAT_RGB8_UINT:
+		return GL_RGB;
+	case Format::FORMAT_RGB8_UNORM:
+		return GL_RGB;
+	case Format::FORMAT_R8_UINT:
+		return GL_RED;
+	case Format::FORMAT_R8_UNORM:
+		return GL_RED;
 	default:
 		return GL_NONE;
 	}
@@ -198,18 +223,62 @@ D3D_PRIMITIVE_TOPOLOGY GetTopology(Topology topology)
 {
 	switch (topology)
 	{
-	case Topology::POINT:
+	case Topology::POINTS:
 		return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
-	case Topology::LINE:
+	case Topology::LINES:
 		return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
 	case Topology::LINE_STRIP:
 		return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
-	case Topology::TRIANGLE:
+	case Topology::TRIANGLES:
 		return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	case Topology::TRIANGLE_STRIP:
 		return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 	default:
 		return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+	}
+}
+DXGI_FORMAT GetFormat(Format format)
+{
+	switch (format)
+	{
+	case Format::FORMAT_RGBA32_UINT:
+		return DXGI_FORMAT_R32G32B32A32_UINT;
+	case Format::FORMAT_RGBA32_FLOAT:
+		return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	case Format::FORMAT_RGB32_UINT:
+		return DXGI_FORMAT_R32G32B32_UINT;
+	case Format::FORMAT_RGB32_FLOAT:
+		return DXGI_FORMAT_R32G32B32_FLOAT;
+	case Format::FORMAT_R32_UINT:
+		return DXGI_FORMAT_R32_UINT;
+	case Format::FORMAT_R32_FLOAT:			
+		return DXGI_FORMAT_R32_FLOAT;
+	case Format::FORMAT_RGBA16_UNIT:
+		return DXGI_FORMAT_R16G16B16A16_UINT;
+	case Format::FORMAT_RGBA16_FLOAT:
+		return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	case Format::FORMAT_RGB16_UINT:				//invalid 48bit format 
+		return DXGI_FORMAT_UNKNOWN;
+	case Format::FORMAT_RGB16_FLOAT:
+		return DXGI_FORMAT_UNKNOWN;
+	case Format::FORMAT_R16_UINT:
+		return DXGI_FORMAT_R16_UINT;
+	case Format::FORMAT_R16_FLOAT:
+		return DXGI_FORMAT_R16_FLOAT;
+	case Format::FORMAT_RGBA8_UINT:
+		return DXGI_FORMAT_R8G8B8A8_UINT;		//RGB8 dosent support 24bit
+	case Format::FORMAT_RGBA8_UNORM:
+		return DXGI_FORMAT_R8G8B8A8_UNORM;
+	case Format::FORMAT_RGB8_UINT:
+		return DXGI_FORMAT_R8G8_UINT;
+	case Format::FORMAT_RGB8_UNORM:
+		return DXGI_FORMAT_R8G8_UNORM;
+	case Format::FORMAT_R8_UINT:
+		return DXGI_FORMAT_R8_UINT;
+	case Format::FORMAT_R8_UNORM:
+		return DXGI_FORMAT_R8_UNORM;
+	default:
+		return DXGI_FORMAT_UNKNOWN;
 	}
 }
 }

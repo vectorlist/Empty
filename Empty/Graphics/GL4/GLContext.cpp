@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include <Graphics/GL4/GLContext.h>
 #include <Graphics/GL4/GLConfig.h>
 
@@ -34,7 +34,6 @@ void GLContext::Clear(float r, float g, float b, float a)
 void GLContext::SwapBuffer()
 {
 	SwapBuffers(mDc);
-	//wglSwapLayerBuffers(mDc, WGL_SWAP_MAIN_PLANE);
 }
 
 void GLContext::SetViewport(const Viewport& vp)
@@ -73,16 +72,12 @@ void GLContext::DrawArrays(VertexBuffer* buffer, uint count)
 
 void GLContext::SetDepthStencilEx(DepthStencilState* state)
 {
-	//TODO : Default for Debug warnnings
-	//Difference of DirectX11 Depth Stencil Test
 	switch (state->Enabled)
 	{
 	case true:
-		//glEnable(GL_STENCIL_TEST); 
 		glEnable(GL_DEPTH_TEST);
 		break;
 	case false:
-		//glDisable(GL_STENCIL_TEST); 
 		glDisable(GL_DEPTH_TEST);
 		break;
 	default:
@@ -99,8 +94,41 @@ void GLContext::SetDepthStencilEx(DepthStencilState* state)
 	default:
 		break;
 	}
+	switch (state->Func)
+	{
+	case DepthFunc::LESS:
+		glDepthFunc(GL_LESS);
+		break;
+	case DepthFunc::LESS_EQUAL:
+		glDepthFunc(GL_LEQUAL);
+		break;
+	default:
+		break;
+	}
 
 }
+
+void GLContext::SetCullMode(CullMode mode)
+{
+	switch (mode)
+	{
+	case CullMode::FRONT:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+		break;
+	case CullMode::BACK:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		break;
+	case CullMode::FRONT_AND_BACK:
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT_AND_BACK);
+	case CullMode::NONE:
+		glDisable(GL_CULL_FACE);
+		break;
+	}
+}
+
 
 void GLContext::Init()
 {
@@ -108,7 +136,6 @@ void GLContext::Init()
 
 	mDc = GetDC((HWND)mHwnd);
 
-	//no glew
 	if (WGL_ARB_create_context && WGL_ARB_pixel_format)
 	{
 		LOG << "support wglew arb extension" << ENDN;
@@ -122,20 +149,6 @@ void GLContext::Init()
 			0
 		};
 
-		//pixelFormatAttribs =
-		//{
-		//	WGL_SAMPLE_BUFFERS_ARB, 0,
-		//	WGL_SAMPLES_ARB, 0,
-		//	WGL_SUPPORT_OPENGL_ARB, true,
-		//	WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-		//	WGL_DRAW_TO_WINDOW_ARB, true,
-		//	WGL_DOUBLE_BUFFER_ARB, true,
-		//	WGL_COLOR_BITS_ARB, 32,
-		//	WGL_DEPTH_BITS_ARB, 24,
-		//	WGL_STENCIL_BITS_ARB, 8,
-		//	0
-		//};
-
 		pixelFormatFloatAttribs = { 0.0f };
 
 		contextAttribs =
@@ -143,18 +156,10 @@ void GLContext::Init()
 			WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
 			WGL_CONTEXT_MINOR_VERSION_ARB, 5,
 			WGL_CONTEXT_FLAGS_ARB,         WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-			//WGL_CONTEXT_RELEASE
-			//TODO : newset opengl can avoid glflush with WGL_CONTEXT_RELEASE_BEHAVIOUR
-			//disable glFlush
-
 			WGL_CONTEXT_RELEASE_BEHAVIOR_ARB, WGL_CONTEXT_RELEASE_BEHAVIOR_NONE_ARB,
-
-			//0x2098, 0x0000,
 			0
 		};
 		
-		//TODO : GL_KHR_debug
-
 		int pixelFormat;
 		int numFormats;	
 		if (!wglChoosePixelFormatARB(mDc, pixelFormatAttribs.data(),
@@ -166,13 +171,11 @@ void GLContext::Init()
 		PIXELFORMATDESCRIPTOR pfd{};		//get more infomation of pixel format
 		DescribePixelFormat(mDc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 
-		//set pixel to device context
 		if (!SetPixelFormat(mDc, pixelFormat, &pfd))
 			LOG_ERROR("failed to set pixel format");
 
 		mRc = wglCreateContextAttribsARB(mDc, 0, contextAttribs.data());
-		//WGLEW_ARB_context_flush_control
-		//connect rc and dc
+
 		wglMakeCurrent(mDc, mRc);
 	}
 	else {
@@ -189,12 +192,9 @@ void GLContext::Init()
 
 	LOG << mCoreInfo << ENDN;
 
-	//check extension GL_ARB_clip_control to control of clip space
 	if (GL_ARB_clip_control) {
-		//matching direct x clip space
 		//https://www.khronos.org/registry/OpenGL/extensions/ARB/ARB_clip_control.txt
 		glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
-		//Not Sure need glDepthRange to (0, 1)
 		glDepthRange(0.0f, 1.0f);
 	}
 
@@ -202,9 +202,8 @@ void GLContext::Init()
 	wglSwapIntervalEXT(mVsync ? 1 : 0);
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-	//glDisable(GL_MULTISAMPLE);
-	//glEnable(GL_MULTISAMPLE);
 	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -213,27 +212,18 @@ void GLContext::Init()
 
 	glViewport(0, 0, (int)mWidth, (int)mHeight);
 	glClearColor(0, 0, 0, 1);
-	//GL_ARB_texture_non_power_of_two
 }
 
 
 bool GLContext::InitExtension()
 {
-	//replace to pure extension
-	//out if we glew init already
-	HINSTANCE inst = GetModuleHandle(NULL);	// get current program address
-
-											//"STATIC" keyword for lpClassName pre defined so u dont need register WNDCLASS
-											//CreateWindowA is not unicode function using CreateWindow if u using unicode
-											//and "Temp" or TEXT("temp") for unicode
+	HINSTANCE inst = GetModuleHandle(NULL);										
 	HWND tempWindow = CreateWindowEx(NULL,
 		"STATIC", "temp", WS_POPUP, 0, 0,
 		0, 0, NULL, NULL, inst, NULL);
 
-	//get dc from temp
 	mDc = GetDC(tempWindow);
 
-	//choose pixel for surface
 	PIXELFORMATDESCRIPTOR pfd{};
 	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
 	pfd.nVersion = 1;
@@ -245,32 +235,18 @@ bool GLContext::InitExtension()
 	pfd.cStencilBits = 8;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
-	//system call pixel value (return 0 is unable to use)
 	int pixelFormat = ::ChoosePixelFormat(mDc, &pfd);
 
 	if (pixelFormat <= 0) return false;
 
-	//set pixel format to temp device context
 	if (!SetPixelFormat(mDc, pixelFormat, &pfd)) return false;
 
-	//well create temp Render context
 	HGLRC tempRc = wglCreateContext(mDc);
-
-	//connect btw dc, temprc
 	wglMakeCurrent(mDc, tempRc);
 
-	//replace glew to wglext(for WGL_CONTEXT_RELEASE_BEHAVIOUR)
-#ifdef _GLEW
-	if (glewInit() != GLEW_OK) {
-		return false;
-	};
-#else
 	if (!WGL::InitWGL()) {
 		return false;
-}
-#endif // _GLEW
-
-	
+	}
 	int extNum;
 	glGetIntegerv(GL_MAX_EXT, &extNum);
 

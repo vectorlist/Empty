@@ -18,16 +18,6 @@ struct RGBA8
 
 typedef std::unique_ptr<uint8[]>	PixelArray;
 
-struct MipmapData
-{
-	uint width;
-	uint height;
-	uint offset;		//starting point
-	uint size;			//size of this level byte 
-	uint8* pData;		//ptr of start pointer
-	uint bytePerPixel;
-};
-
 struct PixelBuffer
 {
 	uint8* pData;

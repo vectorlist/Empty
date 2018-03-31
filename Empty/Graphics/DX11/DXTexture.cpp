@@ -1,4 +1,4 @@
-#include <PCH.h>
+#include <Core/PCH.h>
 #include "dxtexture.h"
 #include <graphics/context.h>
 #include <graphics/dx11/dxconfig.h>
@@ -6,12 +6,11 @@
 #include <graphics/TypeTransform.h>
 #include <Image/Image.h>
 
-//TODO : Seperate Sampler and Texture
 ID3D11SamplerState* DXTexture::mSampler = nullptr;
 
 DXTexture::DXTexture()
+	: mTexture(nullptr)
 {
-	//reffer intermediate device and context for directx11
 	mDevice = G_DXDevice;
 	mContext = G_DXContext;
 }
@@ -22,7 +21,7 @@ DXTexture::~DXTexture()
 	//SAFE_RELEASE(mSampler);
 }
 
-void DXTexture::InitFromFile(const std::string& filename)
+void DXTexture::InitFromDDS(const std::string& filename)
 {
 	std::wstring wide;
 	wide = wide.assign(filename.begin(), filename.end());
@@ -112,46 +111,46 @@ void DXTexture::InitFromImage(const std::string & filename)
 //byte per pixel only for now
 void DXTexture::Init(TextureCreateInfo& info)
 {
-	this->width = info.width;
-	this->height = info.height;
-	//Translate desc
-	D3D11_TEXTURE2D_DESC desc{};
-	desc.Width = info.width;
-	desc.Height = info.height;
-	desc.MipLevels = info.mipLevels;
-	desc.ArraySize = 1;
-	desc.Format = deform::GetDXFormat(info.format);
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = 0;
-	desc.MiscFlags = 0;
+	//this->width = info.width;
+	//this->height = info.height;
+	////Translate desc
+	//D3D11_TEXTURE2D_DESC desc{};
+	//desc.Width = info.width;
+	//desc.Height = info.height;
+	//desc.MipLevels = info.mipLevels;
+	//desc.ArraySize = 1;
+	//desc.Format = deform::GetDXFormat(info.format);
+	//desc.SampleDesc.Count = 1;
+	//desc.SampleDesc.Quality = 0;
+	//desc.Usage = D3D11_USAGE_DEFAULT;
+	//desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	//desc.CPUAccessFlags = 0;
+	//desc.MiscFlags = 0;
 
-	//Data
-	D3D11_SUBRESOURCE_DATA data{};
-	data.pSysMem = info.pData;
-	data.SysMemPitch = width;
-	data.SysMemSlicePitch = width * height;
+	////Data
+	//D3D11_SUBRESOURCE_DATA data{};
+	//data.pSysMem = info.pData;
+	//data.SysMemPitch = width;
+	//data.SysMemSlicePitch = width * height;
 
-	//create texture2d
-	ID3D11Texture2D* texture2d = nullptr;
+	////create texture2d
+	//ID3D11Texture2D* texture2d = nullptr;
 
-	LOG_HR << mDevice->CreateTexture2D(&desc, &data, &texture2d);
+	//LOG_HR << mDevice->CreateTexture2D(&desc, &data, &texture2d);
 
-	//create directx texture
-	D3D11_SHADER_RESOURCE_VIEW_DESC srvInfo{};
-	srvInfo.Format = desc.Format;
-	srvInfo.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	//TODO : detailed Mipmap
-	srvInfo.Texture2D.MipLevels = 1;
-	srvInfo.Texture2D.MostDetailedMip = 0;
+	////create directx texture
+	//D3D11_SHADER_RESOURCE_VIEW_DESC srvInfo{};
+	//srvInfo.Format = desc.Format;
+	//srvInfo.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	////TODO : detailed Mipmap
+	//srvInfo.Texture2D.MipLevels = 1;
+	//srvInfo.Texture2D.MostDetailedMip = 0;
 
-	LOG_HR << mDevice->CreateShaderResourceView(texture2d, &srvInfo, &mTexture);
+	//LOG_HR << mDevice->CreateShaderResourceView(texture2d, &srvInfo, &mTexture);
 
-	SAFE_RELEASE(texture2d);
+	//SAFE_RELEASE(texture2d);
 
-	CreateExternalSampler();
+	//CreateExternalSampler();
 }
 
 void DXTexture::Bind(uint index)

@@ -30,4 +30,5 @@ public:
 	//static Text Batch
 	DebugBatch*		mDebugBatch;
 	FontBatch*		mFontBatch;
+	SpriteBatch*	mSpriteBatch;
 };

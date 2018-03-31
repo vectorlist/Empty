@@ -3,6 +3,7 @@
 #include <Math/AABB.h>
 #include <Core/Type.h>
 
+//Render Able Tree Node
 struct TreeNode
 {
 	uint mLevel;

@@ -82,7 +82,7 @@
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_USE_MATH_DEFINES;</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>PCH.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>Core/PCH.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <AdditionalDependencies>assimp-vc140-mt.lib;freetype271d.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -138,10 +138,19 @@
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Core\Object.cpp" />
+    <ClCompile Include="Core\PCH.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Core/PCH.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Core\Profiler.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
+    <ClCompile Include="Engine\CullManager.cpp" />
     <ClCompile Include="Graphics\BuiltInShader.cpp" />
     <ClCompile Include="Graphics\Context.cpp" />
+    <ClCompile Include="Graphics\DX11\DXFrameBuffer.cpp" />
     <ClCompile Include="Graphics\DX11\DXVertexBuffer.cpp" />
+    <ClCompile Include="Graphics\FrameBuffer.cpp" />
+    <ClCompile Include="Graphics\GL4\GLFrameBuffer.cpp" />
     <ClCompile Include="Graphics\GL4\GLVertexBuffer.cpp" />
     <ClCompile Include="Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Graphics\TypeTransform.cpp" />
@@ -163,10 +172,8 @@
     <ClCompile Include="Image\Mipmap.cpp" />
     <ClCompile Include="math\AABB.cpp" />
     <ClCompile Include="math\Frustum.cpp" />
+    <ClCompile Include="Math\Random.cpp" />
     <ClCompile Include="math\Transform.cpp" />
-    <ClCompile Include="PCH.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Physics\BSP.cpp" />
     <ClCompile Include="physics\BVH.cpp" />
     <ClCompile Include="physics\Physics.cpp" />
@@ -178,6 +185,7 @@
     <ClCompile Include="renderer\batch\FontBatch.cpp" />
     <ClCompile Include="Renderer\batch\GL4\GLDebugBatch.cpp" />
     <ClCompile Include="renderer\batch\GL4\GLFontBatch.cpp" />
+    <ClCompile Include="Renderer\Batch\SpriteBatch.cpp" />
     <ClCompile Include="Renderer\Environment.cpp" />
     <ClCompile Include="renderer\Renderer.cpp" />
     <ClCompile Include="scene\Scene.cpp" />
@@ -203,14 +211,20 @@
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Core\Log.h" />
     <ClInclude Include="Core\Object.h" />
+    <ClInclude Include="Core\PCH.h" />
+    <ClInclude Include="Core\Profiler.h" />
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="Core\Timer.h" />
     <ClInclude Include="Core\Type.h" />
     <ClInclude Include="Core\TypeIndex.h" />
+    <ClInclude Include="Engine\CullManager.h" />
     <ClInclude Include="Graphics\Buffer.h" />
     <ClInclude Include="Graphics\BuiltInShader.h" />
     <ClInclude Include="Graphics\Context.h" />
+    <ClInclude Include="Graphics\DX11\DXFrameBuffer.h" />
     <ClInclude Include="Graphics\DX11\DXVertexBuffer.h" />
+    <ClInclude Include="Graphics\FrameBuffer.h" />
+    <ClInclude Include="Graphics\GL4\GLFrameBuffer.h" />
     <ClInclude Include="Graphics\GL4\GLVertexBuffer.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />
     <ClInclude Include="Graphics\Sampler.h" />
@@ -242,11 +256,11 @@
     <ClInclude Include="math\math.h" />
     <ClInclude Include="math\matrix4x4.h" />
     <ClInclude Include="math\quaternion.h" />
+    <ClInclude Include="Math\Random.h" />
     <ClInclude Include="math\Transform.h" />
     <ClInclude Include="math\vec2f.h" />
     <ClInclude Include="math\vec3f.h" />
     <ClInclude Include="math\vec4f.h" />
-    <ClInclude Include="PCH.h" />
     <ClInclude Include="Physics\BSP.h" />
     <ClInclude Include="physics\BVH.h" />
     <ClInclude Include="physics\Physics.h" />
@@ -259,6 +273,7 @@
     <ClInclude Include="renderer\batch\FontBatch.h" />
     <ClInclude Include="Renderer\batch\GL4\GLDebugBatch.h" />
     <ClInclude Include="renderer\batch\GL4\GLFontBatch.h" />
+    <ClInclude Include="Renderer\Batch\SpriteBatch.h" />
     <ClInclude Include="Renderer\Environment.h" />
     <ClInclude Include="renderer\Renderer.h" />
     <ClInclude Include="scene\scene.h" />
@@ -274,12 +289,61 @@
     <ClInclude Include="World\Terrain.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\data\shader\DeferredPS.glsl" />
+    <None Include="..\data\shader\DeferredVS.glsl" />
     <None Include="..\data\shader\EnvironmentPS.glsl" />
     <None Include="..\data\shader\EnvironmentPS.hlsl">
       <FileType>Document</FileType>
     </None>
     <None Include="..\data\shader\EnvironmentVS.glsl" />
     <None Include="..\data\shader\EnvironmentVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\data\shader\ForwardPS.glsl" />
+    <None Include="..\data\shader\ForwardVS.glsl" />
+    <None Include="..\data\shader\GBufferPS.glsl" />
+    <None Include="..\data\shader\InstanceVS.glsl" />
+    <None Include="..\data\shader\ScreenPS.glsl" />
+    <None Include="..\data\shader\SpriteVS.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\data\shader\GBufferVS.glsl" />
+    <Text Include="..\data\shader\SpritePS.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\SpritePS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\data\shader\SpriteVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\ForwardPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\data\shader\ForwardVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\InstanceVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\GBufferPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\data\shader\GBufferVS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\data\shader\DeferredPS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\data\shader\DeferredVS.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

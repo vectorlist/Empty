@@ -55,6 +55,7 @@ extern PFNGLGENVERTEXARRAYSPROC			glGenVertexArrays;
 extern PFNGLCREATEVERTEXARRAYSPROC		glCreateVertexArrays;
 extern PFNGLVERTEXATTRIBDIVISORPROC		glVertexAttribDivisor;
 extern PFNGLDRAWARRAYSINSTANCEDPROC		glDrawArraysInstanced;
+extern PFNGLDRAWELEMENTSBASEVERTEXPROC  glDrawElementsBaseVertex;
 
 extern PFNGLDELETEBUFFERSPROC			glDeleteBuffers;
 extern PFNGLDELETEVERTEXARRAYSPROC		glDeleteVertexArrays;
@@ -82,11 +83,26 @@ extern PFNGLTEXTUREPARAMETERIPROC		glTextureParameteri;
 extern PFNGLBINDTEXTUREUNITPROC			glBindTextureUnit;
 extern PFNGLGENERATEMIPMAPPROC			glGenerateMipmap;
 
+//=================== FRAME BUFFER ======================
+extern PFNGLGENFRAMEBUFFERSPROC			glGenFramebuffers;
+extern PFNGLBINDFRAMEBUFFERPROC			glBindFramebuffer;
+extern PFNGLFRAMEBUFFERTEXTURE2DPROC	glFramebufferTexture2D;
+extern PFNGLDRAWBUFFERSPROC				glDrawBuffers;
+extern PFNGLGENRENDERBUFFERSPROC		glGenRenderbuffers;
+extern PFNGLBINDRENDERBUFFERPROC		glBindRenderbuffer;
+extern PFNGLRENDERBUFFERSTORAGEPROC		glRenderbufferStorage;
+extern PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
+extern PFNGLCHECKFRAMEBUFFERSTATUSPROC	glCheckFramebufferStatus;
+extern PFNGLBLITFRAMEBUFFERPROC			glBlitFramebuffer;
+
 //=================== EXT ===============================
-extern PFNGLNAMEDBUFFERSUBDATAEXTPROC		glNamedBufferSubDataEXT;
-extern PFNGLBINDBUFFERBASEPROC				glBindBufferBase;
-extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC		glCompressedTexImage2DARB;
-extern PFNGLBINDBUFFERRANGEPROC				glBindBufferRange;
+extern PFNGLNAMEDBUFFERSUBDATAEXTPROC				glNamedBufferSubDataEXT;
+extern PFNGLBINDBUFFERBASEPROC						glBindBufferBase;
+extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC				glCompressedTexImage2DARB;
+extern PFNGLBINDBUFFERRANGEPROC						glBindBufferRange;
+extern PFNGLDRAWELEMENTSINSTANCEDPROC				glDrawElementsInstanced;
+extern PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC		glDrawElementsInstancedBaseVertex;
+extern PFNGLDRAWELEMENTSBASEVERTEXPROC				glDrawElementsBaseVertex;
 
 
 //================== GL 4.4 ==============================
